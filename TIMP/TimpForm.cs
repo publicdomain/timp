@@ -100,7 +100,22 @@ namespace TIMP
         /// <param name="e">E.</param>
         private void OnNotifyIconContextMenuStripItemClicked(object sender, ToolStripItemClickedEventArgs e)
 		{
-            // TODO Add code
+			// Switch the menu items
+            switch(e.ClickedItem.Name)
+            {
+                case "exitToolStripMenuItem":
+                    // Set close flag
+                    this.closeFlag = true;
+
+                    // Hide tray icon
+                    this.notifyIcon.Visible = false;
+
+                    // Exit application
+                    Application.Exit();
+
+                    // Halt flow
+                    break;
+            }
         }
-    }
+	}
 }
