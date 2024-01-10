@@ -117,7 +117,7 @@ namespace TIMP
                         this.playerListBox.Items.Clear();
 
                         // Set files by extension
-                        FileInfo[] files = new DirectoryInfo(this.folderBrowserDialog.SelectedPath).EnumerateFiles("*.*", SearchOption.AllDirectories).Where(file => new string[] { ".mp3", ".wav", ".mid" }.Contains(file.Extension.ToLower())).ToArray();
+                        FileInfo[] files = new DirectoryInfo(this.folderBrowserDialog.SelectedPath).EnumerateFiles("*.*", SearchOption.AllDirectories).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
 
                         // Add to list box
                         this.playerListBox.Items.AddRange(files);
@@ -142,8 +142,11 @@ namespace TIMP
 
                 // Toggle check status
                 default:
-                    // TODO Toggle [Can use a single variable]
-                    ((ToolStripMenuItem)e.ClickedItem).Checked = !((ToolStripMenuItem)e.ClickedItem).Checked;
+                    // Set the clicked item
+                    ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
+
+                    // Toggle check state
+                    toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
 
                     // Halt flow
                     break;
