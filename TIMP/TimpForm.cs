@@ -47,28 +47,41 @@ namespace TIMP
         /// <param name="e">E.</param>
         public void OnMainNotifyIconClick(object sender, MouseEventArgs e)
 		{
-            // TODO Add code
+			if(e.Button == MouseButtons.Left)
+			{				
+				// Open in lower-right corner
+                Rectangle workingArea = Screen.GetWorkingArea(this);
+				this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+				
+                // Show the form
+                this.Show();	            
+            }
         }
-
-        /// <summary>
+		
+		/// <summary>
         /// Ons the close button click.
         /// </summary>
         /// <param name="sender">Sender.</param>
         /// <param name="e">E.</param>
         private void OnCloseButtonClick(object sender, EventArgs e)
 		{
-            // TODO Add code
-        }
-
-        /// <summary>
+            // Hide the form
+            this.Hide();
+		}
+		
+		/// <summary>
         /// Ons the timp form form closing.
         /// </summary>
         /// <param name="sender">Sender.</param>
         /// <param name="e">E.</param>
         private void OnTimpFormFormClosing(object sender, FormClosingEventArgs e)
 		{
-            // TODO Add code
-        }
+			// Hide the form
+            this.Hide();
+
+            // Set it to the opposite of close flag
+            e.Cancel = !closeFlag;
+		}
 
         /// <summary>
         /// Ons the player list box selected index changed.
