@@ -26,10 +26,21 @@ namespace TIMP
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
         public TimpForm(NotifyIcon passedNotifyIcon)
 		{
-            // TODO Add code
-        }
+            // Set the notify icon
+            this.notifyIcon= passedNotifyIcon;
 
-        /// <summary>
+            // The InitializeComponent() call is required for Windows Forms designer support.
+            this.InitializeComponent();
+			
+			// The invisible button
+			Button closeButton = new Button();
+			closeButton.Click += OnCloseButtonClick;
+			
+            // Set cancel button
+            this.CancelButton = closeButton;
+		}
+		
+		/// <summary>
         /// Ons the main notify icon click.
         /// </summary>
         /// <param name="sender">Sender.</param>
