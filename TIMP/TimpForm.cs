@@ -1,15 +1,17 @@
 ﻿
 using System;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace TIMP
 {
-	/// <summary>
-	/// Description of TimpForm.
-	/// </summary>
-	public partial class TimpForm : Form
-	{
+    /// <summary>
+    /// Description of TimpForm.
+    /// </summary>
+    public partial class TimpForm : Form
+    {
         /// <summary>
         /// The notify icon.
         /// </summary>
@@ -25,84 +27,106 @@ namespace TIMP
         /// </summary>
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
         public TimpForm(NotifyIcon passedNotifyIcon)
-		{
+        {
             // Set the notify icon
-            this.notifyIcon= passedNotifyIcon;
+            this.notifyIcon = passedNotifyIcon;
 
             // The InitializeComponent() call is required for Windows Forms designer support.
             this.InitializeComponent();
-			
-			// The invisible button
-			Button closeButton = new Button();
-			closeButton.Click += OnCloseButtonClick;
-			
+
+            // The invisible button
+            Button closeButton = new Button();
+            closeButton.Click += OnCloseButtonClick;
+
             // Set cancel button
             this.CancelButton = closeButton;
-		}
-		
-		/// <summary>
-        /// Ons the main notify icon click.
+        }
+
+        /// <summary>
+        /// Handles the main notify icon click.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         public void OnMainNotifyIconClick(object sender, MouseEventArgs e)
-		{
-			if(e.Button == MouseButtons.Left)
-			{				
-				// Open in lower-right corner
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                // Open in lower-right corner
                 Rectangle workingArea = Screen.GetWorkingArea(this);
-				this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
-				
+                this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+
                 // Show the form
-                this.Show();	            
+                this.Show();
             }
         }
-		
-		/// <summary>
-        /// Ons the close button click.
+
+        /// <summary>
+        /// Handles the close button click.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnCloseButtonClick(object sender, EventArgs e)
-		{
+        {
             // Hide the form
             this.Hide();
-		}
-		
-		/// <summary>
-        /// Ons the timp form form closing.
+        }
+
+        /// <summary>
+        /// Handles the timp form form closing.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnTimpFormFormClosing(object sender, FormClosingEventArgs e)
-		{
-			// Hide the form
+        {
+            // Hide the form
             this.Hide();
 
             // Set it to the opposite of close flag
             e.Cancel = !closeFlag;
-		}
+        }
 
         /// <summary>
-        /// Ons the player list box selected index changed.
+        /// Handles the player list box selected index changed.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
-		{
-			// TODO Add code
-		}
-		
-		/// <summary>
-        /// Ons the notify icon context menu strip item clicked.
+        {
+            // TODO Add code
+        }
+
+        /// <summary>
+        /// Handles the notify icon context menu strip item clicked.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnNotifyIconContextMenuStripItemClicked(object sender, ToolStripItemClickedEventArgs e)
-		{
-			// Switch the menu items
-            switch(e.ClickedItem.Name)
+        {
+            // Switch the menu items
+            switch (e.ClickedItem.Name)
             {
+                // Open folder to populate list box with supported music files
+                case "openFolderToolStripMenuItem":
+                    // Reset selected path
+                    this.folderBrowserDialog.SelectedPath = string.Empty;
+
+                    // Show folder browser dialog
+                    if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
+                    {
+                        // Clear previous items
+                        this.playerListBox.Items.Clear();
+
+                        // Set files by extension
+                        FileInfo[] files = new DirectoryInfo(this.folderBrowserDialog.SelectedPath).EnumerateFiles("*.*", SearchOption.AllDirectories).Where(file => new string[] { ".mp3", ".wav", ".mid" }.Contains(file.Extension.ToLower())).ToArray();
+
+                        // Add to list box
+                        this.playerListBox.Items.AddRange(files);
+                    }
+
+                    // Halt flow
+                    break;
+
+                // Exit
                 case "exitToolStripMenuItem":
                     // Set close flag
                     this.closeFlag = true;
@@ -115,7 +139,16 @@ namespace TIMP
 
                     // Halt flow
                     break;
+
+                // Toggle check status
+                default:
+                    // TODO Toggle [Can use a single variable]
+                    ((ToolStripMenuItem)e.ClickedItem).Checked = !((ToolStripMenuItem)e.ClickedItem).Checked;
+
+                    // Halt flow
+                    break;
             }
+
         }
-	}
+    }
 }
