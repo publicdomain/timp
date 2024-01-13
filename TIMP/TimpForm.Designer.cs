@@ -53,13 +53,13 @@ namespace TIMP
 									this.loopToolStripMenuItem,
 									this.exitToolStripMenuItem});
 			this.notifyIconContextMenuStrip.Name = "notifyIconContextMenuStrip";
-			this.notifyIconContextMenuStrip.Size = new System.Drawing.Size(153, 158);
+			this.notifyIconContextMenuStrip.Size = new System.Drawing.Size(138, 136);
 			this.notifyIconContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.OnNotifyIconContextMenuStripItemClicked);
 			// 
 			// openFolderToolStripMenuItem
 			// 
 			this.openFolderToolStripMenuItem.Name = "openFolderToolStripMenuItem";
-			this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.openFolderToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.openFolderToolStripMenuItem.Text = "&Open folder";
 			// 
 			// randomizeToolStripMenuItem
@@ -67,7 +67,7 @@ namespace TIMP
 			this.randomizeToolStripMenuItem.Checked = true;
 			this.randomizeToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.randomizeToolStripMenuItem.Name = "randomizeToolStripMenuItem";
-			this.randomizeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.randomizeToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.randomizeToolStripMenuItem.Text = "&Randomize";
 			// 
 			// usehotkeysToolStripMenuItem
@@ -75,7 +75,7 @@ namespace TIMP
 			this.usehotkeysToolStripMenuItem.Checked = true;
 			this.usehotkeysToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.usehotkeysToolStripMenuItem.Name = "usehotkeysToolStripMenuItem";
-			this.usehotkeysToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.usehotkeysToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.usehotkeysToolStripMenuItem.Text = "Use &hotkeys";
 			// 
 			// autoplayToolStripMenuItem
@@ -83,7 +83,7 @@ namespace TIMP
 			this.autoplayToolStripMenuItem.Checked = true;
 			this.autoplayToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.autoplayToolStripMenuItem.Name = "autoplayToolStripMenuItem";
-			this.autoplayToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.autoplayToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.autoplayToolStripMenuItem.Text = "&Autoplay";
 			// 
 			// loopToolStripMenuItem
@@ -91,13 +91,13 @@ namespace TIMP
 			this.loopToolStripMenuItem.Checked = true;
 			this.loopToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.loopToolStripMenuItem.Name = "loopToolStripMenuItem";
-			this.loopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.loopToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.loopToolStripMenuItem.Text = "&Loop";
 			// 
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.exitToolStripMenuItem.Text = "&Exit";
 			// 
 			// playerListBox
@@ -109,7 +109,11 @@ namespace TIMP
 			this.playerListBox.Name = "playerListBox";
 			this.playerListBox.Size = new System.Drawing.Size(284, 262);
 			this.playerListBox.TabIndex = 1;
+			this.playerListBox.Click += new System.EventHandler(this.OnPlayerListBoxClick);
+			this.playerListBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnPlayerListBoxMouseClick);
 			this.playerListBox.SelectedIndexChanged += new System.EventHandler(this.OnPlayerListBoxSelectedIndexChanged);
+			this.playerListBox.DoubleClick += new System.EventHandler(this.OnPlayerListBoxDoubleClick);
+			this.playerListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.OnPlayerListBoxMouseDoubleClick);
 			// 
 			// TimpForm
 			// 

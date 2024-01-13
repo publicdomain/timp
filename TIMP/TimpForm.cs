@@ -26,6 +26,11 @@ namespace TIMP
         bool closeFlag = false;
 
         /// <summary>
+        /// The stop flag.
+        /// </summary>
+        bool stopFlag = false;
+
+        /// <summary>
         /// The output device.
         /// </summary>
         private WaveOutEvent outputDevice;
@@ -46,11 +51,6 @@ namespace TIMP
         }
 
         /// <summary>
-        /// The random.
-        /// </summary>
-        private static Random random = new Random();
-        
-        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
@@ -61,6 +61,11 @@ namespace TIMP
 
             // The InitializeComponent() call is required for Windows Forms designer support.
             this.InitializeComponent();
+
+            //# Hide hotkeys menu item [To be implemented]
+            this.usehotkeysToolStripMenuItem.Visible = false;
+            //# Hide autoplay menu item [To be implemented]
+            this.autoplayToolStripMenuItem.Visible = false;
 
             // The invisible button
             Button closeButton = new Button();
@@ -79,12 +84,21 @@ namespace TIMP
         {
             if (e.Button == MouseButtons.Left)
             {
-                // Open in lower-right corner
-                Rectangle workingArea = Screen.GetWorkingArea(this);
-                this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+                // Check if it's not visible
+                if (this.Visible == false)
+                {
+                    // Open in lower-right corner
+                    Rectangle workingArea = Screen.GetWorkingArea(this);
+                    this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
 
-                // Show the form
-                this.Show();
+                    // Show the form
+                    this.Show();
+                }
+                else
+                {
+                    // Hide the form
+                    this.Hide();
+                }
             }
         }
 
@@ -120,8 +134,7 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
-            // TODO Play selected one [May be improved]
-            this.NAudioPlayNew(Path.Combine(this.folderBrowserDialog.SelectedPath, this.playerListBox.Items[this.playerListBox.SelectedIndex].ToString()));
+            // TODO Add code or remove
         }
 
         /// <summary>
@@ -142,23 +155,26 @@ namespace TIMP
                     // Show folder browser dialog
                     if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
                     {
-                        // Clear previous items
-                        this.playerListBox.Items.Clear();
-
                         // Set files by extension
                         FileInfo[] files = new DirectoryInfo(this.folderBrowserDialog.SelectedPath).EnumerateFiles("*.*", SearchOption.TopDirectoryOnly).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
 
                         // Check there are files
                         if (files.Length > 0)
                         {
+                            // Clear previous items
+                            this.playerListBox.Items.Clear();
+
+                            // Reset current player
+                            this.NAudioReset();
+
                             // Get only file names
                             List<string> filesList = files.Select(f => f.Name).ToList();
 
                             // Check if must shuffle
-                            if(this.randomizeToolStripMenuItem.Checked)
+                            if (this.randomizeToolStripMenuItem.Checked)
                             {
-                                // TODO Shuffle files list [Can be improved by System.Security.Cryptography's RNGCryptoServiceProvider]
-                                filesList.OrderBy(a => random.Next()).ToList();
+                                // Shuffle files list
+                                filesList.Shuffle();
                             }
 
                             // Add files to list box
@@ -169,9 +185,8 @@ namespace TIMP
                             {
                                 try
                                 {
-                                    // Play first file by selected index change
-                                    this.playerListBox.SelectedIndex = -1; // Deselect current
-                                    this.playerListBox.SelectedIndex = 0; // Trigger selected change event
+                                    // Play first file
+                                    this.PlayAndSelect(0);
                                 }
                                 catch (Exception ex)
                                 {
@@ -218,6 +233,13 @@ namespace TIMP
         /// <param name="audioFilePath">Audio file path.</param>
         private void NAudioPlayNew(string audioFilePath)
         {
+            // Check file exists
+            if (!File.Exists(audioFilePath))
+            {
+                // Halt flow
+                return;
+            }
+
             // Check for a previous output device
             if (outputDevice != null)
             {
@@ -269,8 +291,33 @@ namespace TIMP
         /// <param name="args">Arguments.</param>
         private void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
-            // Dispose by reset
-            this.NAudioReset();
+            // Check if must exit immediately
+            if (this.stopFlag == false)
+            {
+                // Dispose by reset
+                this.NAudioReset();
+            }
+
+            // If nothing is selected, exit function
+            if (this.playerListBox.SelectedIndex == -1)
+            {
+                // Halt flow
+                return;
+            }
+            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for last one
+            {
+                // Check if must loop
+                if (this.loopToolStripMenuItem.Checked)
+                {
+                    // Loop play / Play and select first one
+                    this.PlayAndSelect(0);
+                }
+            }
+            else
+            {
+                // Play the next one
+                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
+            }
         }
 
         /// <summary>
@@ -278,9 +325,13 @@ namespace TIMP
         /// </summary>
         private void NAudioReset()
         {
+            // Set the stop flag
+            this.stopFlag = true;
+
             // Reset output device
             if (this.outputDevice != null)
             {
+                this.outputDevice.Stop();
                 this.outputDevice.Dispose();
                 this.outputDevice = null;
             }
@@ -291,6 +342,61 @@ namespace TIMP
                 this.audioFile.Dispose();
                 this.audioFile = null;
             }
+
+            // Reset the stop flag
+            this.stopFlag = false;
+        }
+
+        void OnPlayerListBoxClick(object sender, EventArgs e)
+        {
+
+        }
+
+        void OnPlayerListBoxDoubleClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the player list box mouse click.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        private void OnPlayerListBoxMouseClick(object sender, MouseEventArgs e)
+        {
+            // Check for left click
+            if (e.Button == MouseButtons.Left)
+            {
+                // Play selected
+                //#this.PlayByIndex(this.playerListBox.SelectedIndex);
+            }
+        }
+
+        void OnPlayerListBoxMouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Plaies the and select.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        private void PlayAndSelect(int index)
+        {
+            // Set selected index
+            this.playerListBox.SelectedIndex = index;
+
+            // Play by selected index
+            this.PlayByIndex(this.playerListBox.SelectedIndex);
+        }
+
+        /// <summary>
+        /// Plays the selected one.
+        /// </summary>
+        private void PlayByIndex(int index)
+        {
+            // Play selected one
+            this.NAudioPlayNew(Path.Combine(this.folderBrowserDialog.SelectedPath, this.playerListBox.Items[index].ToString()));
         }
     }
 }
