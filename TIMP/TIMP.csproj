@@ -46,6 +46,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
     </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="NAudio">
+      <HintPath>Resources\NAudio.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -55,11 +59,14 @@
     <Compile Include="TimpForm.Designer.cs">
       <DependentUpon>TimpForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Audio.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Resources\4105562_audio_melody_music_sound_icon.ico" />
     <None Include="Resources\publicdomain.is_7-8-vista-xp.ico" />
+    <None Include="packages.config" />
+    <None Include="Resources\NAudio.dll" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TimpForm.resx">
