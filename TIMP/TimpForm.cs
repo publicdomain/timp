@@ -51,6 +51,11 @@ namespace TIMP
         }
 
         /// <summary>
+        /// The directory path.
+        /// </summary>
+        private string directoryPath;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
@@ -73,6 +78,30 @@ namespace TIMP
 
             // Set cancel button
             this.CancelButton = closeButton;
+
+            // Ser arguments variable
+            string[] args = Environment.GetCommandLineArgs();
+
+            // Check if something has been passed
+            if (args.Length > 1)
+            {
+                // Check for a valid directory 
+                if (Directory.Exists(args[1]))
+                {
+                    // Process passed directory
+                    this.ProcessDirectory(args[1]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the timp form load.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnTimpFormLoad(object sender, EventArgs e)
+        {
+            // TODO Add code
         }
 
         /// <summary>
@@ -155,46 +184,8 @@ namespace TIMP
                     // Show folder browser dialog
                     if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
                     {
-                        // Set files by extension
-                        FileInfo[] files = new DirectoryInfo(this.folderBrowserDialog.SelectedPath).EnumerateFiles("*.*", SearchOption.TopDirectoryOnly).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
-
-                        // Check there are files
-                        if (files.Length > 0)
-                        {
-                            // Clear previous items
-                            this.playerListBox.Items.Clear();
-
-                            // Reset current player
-                            this.NAudioReset();
-
-                            // Get only file names
-                            List<string> filesList = files.Select(f => f.Name).ToList();
-
-                            // Check if must shuffle
-                            if (this.randomizeToolStripMenuItem.Checked)
-                            {
-                                // Shuffle files list
-                                filesList.Shuffle();
-                            }
-
-                            // Add files to list box
-                            this.playerListBox.Items.AddRange(filesList.ToArray());
-
-                            // Check if must autoplay
-                            if (this.autoplayToolStripMenuItem.Checked)
-                            {
-                                try
-                                {
-                                    // Play first file
-                                    this.PlayAndSelect(0);
-                                }
-                                catch (Exception ex)
-                                {
-                                    // TODO Log to file
-                                    MessageBox.Show(ex.Message);
-                                }
-                            }
-                        }
+                        // Process selected directory
+                        this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
                     }
 
                     // Halt flow
@@ -224,6 +215,57 @@ namespace TIMP
 
                     // Halt flow
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Processes the directory.
+        /// </summary>
+        /// <param name="passedDirectoryPath">Passed directory path.</param>
+        private void ProcessDirectory(string passedDirectoryPath)
+        {
+            // Set files by extension
+            FileInfo[] files = new DirectoryInfo(passedDirectoryPath).EnumerateFiles("*.*", SearchOption.TopDirectoryOnly).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
+
+            // Check there are files
+            if (files.Length > 0)
+            {
+                // Set directory path
+                this.directoryPath = passedDirectoryPath;
+
+                // Set files list
+                List<string> filesList = files.Select(f => f.Name).ToList();
+
+                // Clear previous items
+                this.playerListBox.Items.Clear();
+
+                // Reset current player
+                this.NAudioReset();
+
+                // Check if must shuffle
+                if (this.randomizeToolStripMenuItem.Checked)
+                {
+                    // Shuffle files list
+                    filesList.Shuffle();
+                }
+
+                // Add files to list box
+                this.playerListBox.Items.AddRange(filesList.ToArray());
+
+                // Check if must autoplay
+                if (this.autoplayToolStripMenuItem.Checked)
+                {
+                    try
+                    {
+                        // Play first file
+                        this.PlayAndSelect(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO Log to file
+                        MessageBox.Show(ex.Message);
+                    }
+                }
             }
         }
 
@@ -281,7 +323,7 @@ namespace TIMP
         private void NAudioStop()
         {
             // Stop the output device
-            this.outputDevice?.Stop();
+            //#this.outputDevice?.Stop();
         }
 
         /// <summary>
@@ -396,7 +438,7 @@ namespace TIMP
         private void PlayByIndex(int index)
         {
             // Play selected one
-            this.NAudioPlayNew(Path.Combine(this.folderBrowserDialog.SelectedPath, this.playerListBox.Items[index].ToString()));
+            this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()));
         }
     }
 }

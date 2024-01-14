@@ -128,6 +128,7 @@ namespace TIMP
 			this.Text = "Tray Icon Music Player";
 			this.TopMost = true;
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnTimpFormFormClosing);
+			this.Load += new System.EventHandler(this.OnTimpFormLoad);
 			this.notifyIconContextMenuStrip.ResumeLayout(false);
 			this.ResumeLayout(false);
 		}

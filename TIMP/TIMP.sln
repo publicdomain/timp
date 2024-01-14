@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 # SharpDevelop 4.4
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMP", "TIMP.csproj", "{90A67069-CB40-4075-B8C4-252AC493FF6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMP", "TIMP.csproj", "{A7B3033D-6584-4111-8442-84DFF5FF94BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,9 +10,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{90A67069-CB40-4075-B8C4-252AC493FF6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{90A67069-CB40-4075-B8C4-252AC493FF6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{90A67069-CB40-4075-B8C4-252AC493FF6F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{90A67069-CB40-4075-B8C4-252AC493FF6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B3033D-6584-4111-8442-84DFF5FF94BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B3033D-6584-4111-8442-84DFF5FF94BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B3033D-6584-4111-8442-84DFF5FF94BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B3033D-6584-4111-8442-84DFF5FF94BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 EndGlobal
