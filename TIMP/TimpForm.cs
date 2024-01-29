@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -7,7 +6,6 @@ using System.Linq;
 using System.Windows.Forms;
 using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
-using Silence;
 
 namespace TIMP
 {
@@ -16,17 +14,15 @@ namespace TIMP
     /// </summary>
     public partial class TimpForm : Form
     {
-        private const double V = 1.0;
-
         /// <summary>
         /// The notify icon.
         /// </summary>
         NotifyIcon notifyIcon;
 
         /// <summary>
-        /// The play file.
+        /// The timp application context.
         /// </summary>
-        Audio playFile;
+        TimpApplicationContext timpApplicationContext;
 
         /// <summary>
         /// The close flag.
@@ -67,13 +63,13 @@ namespace TIMP
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
-        public TimpForm(NotifyIcon passedNotifyIcon, Audio playFile)
+        public TimpForm(NotifyIcon passedNotifyIcon, TimpApplicationContext timpApplicationContext)
         {
             // Set the notify icon
             this.notifyIcon = passedNotifyIcon;
 
-            // Set the play file
-            this.playFile = playFile;
+            // Set the TIMP application context 
+            this.timpApplicationContext = timpApplicationContext;
 
             // The InitializeComponent() call is required for Windows Forms designer support.
             this.InitializeComponent();
@@ -93,15 +89,11 @@ namespace TIMP
             // Ser arguments variable
             string[] args = Environment.GetCommandLineArgs();
 
-            // Check if something has been passed
-            if (args.Length > 1)
+            // Check if a directory has been passed for play
+            if (args.Length > 2 && args[1].ToLowerInvariant() == "/play" && Directory.Exists(args[2]))
             {
-                // Check for a valid directory 
-                if (Directory.Exists(args[1]))
-                {
-                    // Process passed directory
-                    this.ProcessDirectory(args[1]);
-                }
+                // Process passed directory
+                this.ProcessDirectory(args[1]);
             }
         }
 
@@ -274,83 +266,26 @@ namespace TIMP
                     catch (Exception ex)
                     {
                         // TODO Log to file
-                        MessageBox.Show(ex.Message);
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// NAs the udio play new.
-        /// </summary>
-        /// <param name="audioFilePath">Audio file path.</param>
-        private void NAudioPlayNew(string audioFilePath)
+        void OnPlayerListBoxClick(object sender, EventArgs e)
         {
-            // Check file exists
-            if (!File.Exists(audioFilePath))
-            {
-                // Halt flow
-                return;
-            }
 
-            // Check for a previous output device
-            if (outputDevice != null)
-            {
-                // Reset NAudio
-                this.NAudioReset();
-            }
+        }
 
-            // Set the output device
-            outputDevice = new WaveOutEvent();
-            outputDevice.PlaybackStopped += OnPlaybackStopped;
+        void OnPlayerListBoxDoubleClick(object sender, EventArgs e)
+        {
 
-            // Set the audio file and init
-            audioFile = new AudioFileReader(audioFilePath);
-            outputDevice.Init(audioFile);
-
-            // Play it
-            outputDevice.Play();
         }
 
         /// <summary>
-        /// NAs the udio play.
+        /// Plays the next.
         /// </summary>
-        private void NAudioPlay()
+        private void PlayNext()
         {
-            // TODO Reserved for play/pause
-        }
-
-        /// <summary>
-        /// NAs the udio play.
-        /// </summary>
-        private void NAudioPause()
-        {
-            // TODO Reserved for play/pause
-        }
-
-        /// <summary>
-        /// Stop NAudio playback.
-        /// </summary>
-        private void NAudioStop()
-        {
-            // Stop the output device
-            //#this.outputDevice?.Stop();
-        }
-
-        /// <summary>
-        /// Ons the playback stopped.
-        /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="args">Arguments.</param>
-        private void OnPlaybackStopped(object sender, StoppedEventArgs args)
-        {
-            // Check if must exit immediately
-            if (this.stopFlag == false)
-            {
-                // Dispose by reset
-                this.NAudioReset();
-            }
-
             // If nothing is selected, exit function
             if (this.playerListBox.SelectedIndex == -1)
             {
@@ -371,43 +306,6 @@ namespace TIMP
                 // Play the next one
                 this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
             }
-        }
-
-        /// <summary>
-        /// NAs the udio reset.
-        /// </summary>
-        private void NAudioReset()
-        {
-            // Set the stop flag
-            this.stopFlag = true;
-
-            // Reset output device
-            if (this.outputDevice != null)
-            {
-                this.outputDevice.Stop();
-                this.outputDevice.Dispose();
-                this.outputDevice = null;
-            }
-
-            // Reset audio file
-            if (this.audioFile != null)
-            {
-                this.audioFile.Dispose();
-                this.audioFile = null;
-            }
-
-            // Reset the stop flag
-            this.stopFlag = false;
-        }
-
-        void OnPlayerListBoxClick(object sender, EventArgs e)
-        {
-
-        }
-
-        void OnPlayerListBoxDoubleClick(object sender, EventArgs e)
-        {
-
         }
 
         /// <summary>
@@ -451,31 +349,107 @@ namespace TIMP
         {
             try
             {
-                // Check for any previous instance
-                if (this.playFile != null)
-                {
-                    // Stop if playing
-                    if (this.playFile.State != Audio.PlayBackState.Stopped)
-                    {
-                        this.playFile.Stop();
-                    }
-
-                    // Dispose
-                    this.playFile.Dispose();
-                }
-
-                // Set new play file instance
-                this.playFile = new Audio(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()))
-                {
-                    //Volume = (float)1
-                };
-
-                // Make it sound!
-                this.playFile.Play();
+                // Play selected one
+                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()));
             }
             catch (Exception ex)
             {
                 // TODO Log
+            }
+        }
+
+        /// <summary>
+        /// NAs the udio play new.
+        /// </summary>
+        /// <param name="audioFilePath">Audio file path.</param>
+        private void NAudioPlayNew(string audioFilePath)
+        {
+            // Check file exists
+            if (!File.Exists(audioFilePath))
+            {
+                // Halt flow
+                return;
+            }
+
+            // Check for a previous output device
+            if (outputDevice != null)
+            {
+                // Reset NAudio
+                this.NAudioReset();
+            }
+
+            // Set the output device
+            outputDevice = new WaveOutEvent();
+            outputDevice.PlaybackStopped += OnPlaybackStopped;
+
+            // Set the audio file and init
+            audioFile = new AudioFileReader(audioFilePath);
+            outputDevice.Init(audioFile);
+
+            // Play it
+            outputDevice.Play();
+        }
+
+        /// <summary>
+        /// NAs the udio reset.
+        /// </summary>
+        private void NAudioReset()
+        {
+            // Set the stop flag
+            this.stopFlag = true;
+
+            // Reset output device
+            if (this.outputDevice != null)
+            {
+                this.outputDevice.Stop();
+                this.outputDevice.Dispose();
+                this.outputDevice = null;
+            }
+
+            // Reset audio file
+            if (this.audioFile != null)
+            {
+                this.audioFile.Dispose();
+                this.audioFile = null;
+            }
+
+            // Reset the stop flag
+            this.stopFlag = false;
+        }
+
+        /// <summary>
+        /// Ons the playback stopped.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="args">Arguments.</param>
+        private void OnPlaybackStopped(object sender, StoppedEventArgs args)
+        {
+            // Check if must exit immediately
+            if (this.stopFlag == false)
+            {
+                // Dispose by reset
+                this.NAudioReset();
+            }
+
+            // If nothing is selected, exit function
+            if (this.playerListBox.SelectedIndex == -1)
+            {
+                // Halt flow
+                return;
+            }
+            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for last one
+            {
+                // Check if must loop
+                if (this.loopToolStripMenuItem.Checked)
+                {
+                    // Loop play / Play and select first one
+                    this.PlayAndSelect(0);
+                }
+            }
+            else
+            {
+                // Play the next one
+                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
             }
         }
     }

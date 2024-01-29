@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using NamedPipeWrapper;
-using Silence;
+using NAudio.Wave;
 
 namespace TIMP
 {
@@ -30,17 +30,12 @@ namespace TIMP
         NamedPipeServer<Arguments> server = new NamedPipeServer<Arguments>("TimpServerPipe");
 
         /// <summary>
-        /// The play file.
-        /// </summary>
-        Audio playFile;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpApplicationContext"/> class.
         /// </summary>
         public TimpApplicationContext()
         {
             // Set TIMP window
-            this.timpWindow = new TimpForm(this.notifyIcon, playFile);
+            this.timpWindow = new TimpForm(this.notifyIcon, this);
 
             // Set notify icon
             this.notifyIcon.Icon = this.timpWindow.Icon;
