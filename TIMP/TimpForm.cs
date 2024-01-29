@@ -282,6 +282,33 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Plays the previous.
+        /// </summary>
+        private void PlayPrev()
+        {
+            // If nothing is selected, exit function
+            if (this.playerListBox.SelectedIndex == -1)
+            {
+                // Halt flow
+                return;
+            }
+            else if (this.playerListBox.SelectedIndex == 0) // Check for the firt one
+            {
+                // Check if must loop
+                if (this.loopToolStripMenuItem.Checked)
+                {
+                    // Loop play / Play and select last one
+                    this.PlayAndSelect(this.playerListBox.Items.Count - 1);
+                }
+            }
+            else
+            {
+                // Play the next one
+                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
+            }
+        }
+
+        /// <summary>
         /// Plays the next.
         /// </summary>
         private void PlayNext()
@@ -292,7 +319,7 @@ namespace TIMP
                 // Halt flow
                 return;
             }
-            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for last one
+            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for the last one
             {
                 // Check if must loop
                 if (this.loopToolStripMenuItem.Checked)
