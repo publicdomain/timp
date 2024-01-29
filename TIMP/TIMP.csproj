@@ -48,6 +48,9 @@
     <Reference Include="NAudio">
       <HintPath>Resources\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="NamedPipeWrapper">
+      <HintPath>packages\NamedPipeWrapper.1.5.0\lib\net40\NamedPipeWrapper.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
@@ -58,12 +61,14 @@
     <Compile Include="TimpForm.Designer.cs">
       <DependentUpon>TimpForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Arguments.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Resources\4105562_audio_melody_music_sound_icon.ico" />
     <None Include="Resources\NAudio.dll" />
     <None Include="Resources\publicdomain.is_7-8-vista-xp.ico" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TimpForm.resx">

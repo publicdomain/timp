@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+using NamedPipeWrapper;
+using System.Linq;
 
 namespace TIMP
 {
@@ -29,7 +31,22 @@ namespace TIMP
             // Check the mutex flag
             if (!mutexFlag)
             {
-                // There is an instance of TIMP running, exit
+                try
+                {
+                    var client = new NamedPipeClient<Arguments>("TimpServerPipe");
+
+                    client.Start();
+                    client.WaitForConnection(5000);
+                    client.PushMessage(new Arguments() { Args = args });
+                    client.WaitForDisconnection(5000);
+                    client.Stop();
+                }
+                catch (Exception ex)
+                {
+                    // TODO Log
+                }
+
+                // Halt program flow
                 return;
             }
 
