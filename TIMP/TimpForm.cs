@@ -90,10 +90,48 @@ namespace TIMP
             string[] args = Environment.GetCommandLineArgs();
 
             // Check if a directory has been passed for play
-            if (args.Length > 2 && args[1].ToLowerInvariant() == "/play" && Directory.Exists(args[2]))
+            if (args.Length > 2 && args[1].ToLowerInvariant() == "/play")
             {
-                // Process passed directory
-                this.ProcessDirectory(args[1]);
+                // Check if it exists
+                if (Directory.Exists(args[2]))
+                {
+                    // Process passed directory
+                    this.ProcessDirectory(args[2]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Processes the client message.
+        /// </summary>
+        /// <param name="args">Arguments.</param>
+        public void ProcessClientMessage(string[] timpArguments)
+        {
+            // Switch the passed TIMP arguments
+            switch (timpArguments[0].ToLowerInvariant())
+            {
+                // Previous
+                case "/prev":
+
+                    this.PlayPrev();
+
+                    break;
+
+                // Previous
+                case "/next":
+
+                    this.PlayNext();
+
+                    break;
+
+                // Exit
+                case "/exit":
+                    this.timpApplicationContext.ExitThread();
+
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -166,7 +204,15 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
-            // TODO Add code or remove
+            try
+            {
+                // Play selected one
+                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[this.playerListBox.SelectedIndex].ToString()));
+            }
+            catch (Exception ex)
+            {
+                // TODO Log
+            }
         }
 
         /// <summary>
@@ -261,7 +307,7 @@ namespace TIMP
                     try
                     {
                         // Play first file
-                        this.PlayAndSelect(0);
+                        this.PlayByIndex(0);
                     }
                     catch (Exception ex)
                     {
@@ -273,12 +319,12 @@ namespace TIMP
 
         void OnPlayerListBoxClick(object sender, EventArgs e)
         {
-
+            // TODO Use or remove
         }
 
         void OnPlayerListBoxDoubleClick(object sender, EventArgs e)
         {
-
+            // TODO Use or remove
         }
 
         /// <summary>
@@ -298,13 +344,13 @@ namespace TIMP
                 if (this.loopToolStripMenuItem.Checked)
                 {
                     // Loop play / Play and select last one
-                    this.PlayAndSelect(this.playerListBox.Items.Count - 1);
+                    this.PlayByIndex(this.playerListBox.Items.Count - 1);
                 }
             }
             else
             {
-                // Play the next one
-                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
+                // Play the previous one
+                this.PlayByIndex(this.playerListBox.SelectedIndex - 1);
             }
         }
 
@@ -325,13 +371,13 @@ namespace TIMP
                 if (this.loopToolStripMenuItem.Checked)
                 {
                     // Loop play / Play and select first one
-                    this.PlayAndSelect(0);
+                    this.PlayByIndex(0);
                 }
             }
             else
             {
                 // Play the next one
-                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
+                this.PlayByIndex(this.playerListBox.SelectedIndex + 1);
             }
         }
 
@@ -342,30 +388,19 @@ namespace TIMP
         /// <param name="e">E.</param>
         private void OnPlayerListBoxMouseClick(object sender, MouseEventArgs e)
         {
-            // Check for left click
+            // TODO Use or remove
+
+            /*// Check for left click
             if (e.Button == MouseButtons.Left)
             {
                 // Play selected
                 this.PlayByIndex(this.playerListBox.SelectedIndex);
-            }
+            }*/
         }
 
         void OnPlayerListBoxMouseDoubleClick(object sender, MouseEventArgs e)
         {
-
-        }
-
-        /// <summary>
-        /// Plaies the and select.
-        /// </summary>
-        /// <param name="index">Index.</param>
-        private void PlayAndSelect(int index)
-        {
-            // Set selected index
-            this.playerListBox.SelectedIndex = index;
-
-            // Play by selected index
-            this.PlayByIndex(this.playerListBox.SelectedIndex);
+            // TODO Use or remove
         }
 
         /// <summary>
@@ -374,15 +409,8 @@ namespace TIMP
         /// <param name="index">Index.</param>
         private void PlayByIndex(int index)
         {
-            try
-            {
-                // Play selected one
-                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()));
-            }
-            catch (Exception ex)
-            {
-                // TODO Log
-            }
+            // Set selected index
+            this.playerListBox.SelectedIndex = index;
         }
 
         /// <summary>
@@ -452,31 +480,22 @@ namespace TIMP
         private void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
             // Check if must exit immediately
-            if (this.stopFlag == false)
+            if (this.stopFlag)
             {
-                // Dispose by reset
-                this.NAudioReset();
+                // Halt flow
+                return;
             }
 
-            // If nothing is selected, exit function
+            // TODO If nothing is selected, exit function [May be improved, e.g. using the check above]
             if (this.playerListBox.SelectedIndex == -1)
             {
                 // Halt flow
                 return;
             }
-            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for last one
-            {
-                // Check if must loop
-                if (this.loopToolStripMenuItem.Checked)
-                {
-                    // Loop play / Play and select first one
-                    this.PlayAndSelect(0);
-                }
-            }
             else
             {
                 // Play the next one
-                this.PlayAndSelect(this.playerListBox.SelectedIndex + 1);
+                this.PlayNext();
             }
         }
     }

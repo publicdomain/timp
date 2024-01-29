@@ -57,7 +57,8 @@ namespace TIMP
         /// <param name="arguments">Arguments.</param>
         private void OnClientMessage(NamedPipeConnection<Arguments, Arguments> conn, Arguments arguments)
         {
-            // TODO Process arguments.Args
+            // Process client message on TIMP window
+            this.timpWindow.ProcessClientMessage(arguments.Args);
         }
     }
 }
