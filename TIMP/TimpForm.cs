@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
+using Silence;
 
 namespace TIMP
 {
@@ -15,10 +16,17 @@ namespace TIMP
     /// </summary>
     public partial class TimpForm : Form
     {
+        private const double V = 1.0;
+
         /// <summary>
         /// The notify icon.
         /// </summary>
         NotifyIcon notifyIcon;
+
+        /// <summary>
+        /// The play file.
+        /// </summary>
+        Audio playFile;
 
         /// <summary>
         /// The close flag.
@@ -59,10 +67,13 @@ namespace TIMP
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
-        public TimpForm(NotifyIcon passedNotifyIcon)
+        public TimpForm(NotifyIcon passedNotifyIcon, Audio playFile)
         {
             // Set the notify icon
             this.notifyIcon = passedNotifyIcon;
+
+            // Set the play file
+            this.playFile = playFile;
 
             // The InitializeComponent() call is required for Windows Forms designer support.
             this.InitializeComponent();
@@ -240,7 +251,7 @@ namespace TIMP
                 this.playerListBox.Items.Clear();
 
                 // Reset current player
-                this.NAudioReset();
+                //this.NAudioReset();
 
                 // Check if must shuffle
                 if (this.randomizeToolStripMenuItem.Checked)
@@ -410,7 +421,7 @@ namespace TIMP
             if (e.Button == MouseButtons.Left)
             {
                 // Play selected
-                //#this.PlayByIndex(this.playerListBox.SelectedIndex);
+                this.PlayByIndex(this.playerListBox.SelectedIndex);
             }
         }
 
@@ -433,12 +444,39 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Plays the selected one.
+        /// Plays by passed list index
         /// </summary>
+        /// <param name="index">Index.</param>
         private void PlayByIndex(int index)
         {
-            // Play selected one
-            this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()));
+            try
+            {
+                // Check for any previous instance
+                if (this.playFile != null)
+                {
+                    // Stop if playing
+                    if (this.playFile.State != Audio.PlayBackState.Stopped)
+                    {
+                        this.playFile.Stop();
+                    }
+
+                    // Dispose
+                    this.playFile.Dispose();
+                }
+
+                // Set new play file instance
+                this.playFile = new Audio(Path.Combine(this.directoryPath, this.playerListBox.Items[index].ToString()))
+                {
+                    //Volume = (float)1
+                };
+
+                // Make it sound!
+                this.playFile.Play();
+            }
+            catch (Exception ex)
+            {
+                // TODO Log
+            }
         }
     }
 }

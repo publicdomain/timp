@@ -62,6 +62,7 @@
       <DependentUpon>TimpForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Arguments.cs" />
+    <Compile Include="Audio.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
