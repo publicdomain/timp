@@ -86,14 +86,25 @@ namespace TIMP
             // Set cancel button
             this.CancelButton = closeButton;
 
-            // Ser arguments variable
-            string[] args = Environment.GetCommandLineArgs();
+            // Process play command
+            this.ProcessPlayCommand(Environment.GetCommandLineArgs());
+        }
 
+        /// <summary>
+        /// Processes the play command.
+        /// </summary>
+        private void ProcessPlayCommand(string[] args)
+        {
             // Check if a directory has been passed for play
             if (args.Length > 2 && args[1].ToLowerInvariant() == "/play")
             {
-                // Check if it exists
-                if (Directory.Exists(args[2]))
+                // Check if it's current directory
+                if (args[2].ToLowerInvariant() == "current")
+                {
+                    // Process current directory
+                    this.ProcessDirectory(Application.StartupPath);
+                }
+                else if (Directory.Exists(args[2])) // Check if directory exists
                 {
                     // Process passed directory
                     this.ProcessDirectory(args[2]);
@@ -131,6 +142,12 @@ namespace TIMP
                 // Stop
                 case "/stop":
                     this.NAudioStop();
+
+                    break;
+
+                // Play
+                case "/play":
+                    // Check for a single argument
 
                     break;
 
@@ -460,11 +477,26 @@ namespace TIMP
         /// </summary>
         private void NAudioStop()
         {
-            // Reset output device
+            // Check there is an output device
             if (this.outputDevice != null)
             {
                 // Set the stop flag
                 this.stopFlag = true;
+
+                // Stop the device
+                this.outputDevice.Stop();
+            }
+        }
+
+        /// <summary>
+        /// NAs the udio play.
+        /// </summary>
+        private void NAudioPlay()
+        {
+            // Check there is an output device
+            if (this.outputDevice != null)
+            {
+                // 
 
                 // Stop the device
                 this.outputDevice.Stop();
