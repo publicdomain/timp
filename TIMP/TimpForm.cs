@@ -110,23 +110,33 @@ namespace TIMP
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
             {
-                // Previous
-                case "/prev":
-
-                    this.PlayPrev();
+                // Exit
+                case "/exit":
+                    this.timpApplicationContext.ExitThread();
 
                     break;
 
-                // Previous
+                // Next
                 case "/next":
-
                     this.PlayNext();
 
                     break;
 
-                // Exit
-                case "/exit":
-                    this.timpApplicationContext.ExitThread();
+                // Previous
+                case "/prev":
+                    this.PlayPrev();
+
+                    break;
+
+                // Stop
+                case "/stop":
+                    this.NAudioStop();
+
+                    break;
+
+                // Shuffle
+                case "/shuffle":
+                    // Check for 
 
                     break;
 
@@ -427,22 +437,38 @@ namespace TIMP
             }
 
             // Check for a previous output device
-            if (outputDevice != null)
+            if (this.outputDevice != null)
             {
                 // Reset NAudio
                 this.NAudioReset();
             }
 
             // Set the output device
-            outputDevice = new WaveOutEvent();
-            outputDevice.PlaybackStopped += OnPlaybackStopped;
+            this.outputDevice = new WaveOutEvent();
+            this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
 
             // Set the audio file and init
-            audioFile = new AudioFileReader(audioFilePath);
-            outputDevice.Init(audioFile);
+            this.audioFile = new AudioFileReader(audioFilePath);
+            this.outputDevice.Init(audioFile);
 
             // Play it
-            outputDevice.Play();
+            this.outputDevice.Play();
+        }
+
+        /// <summary>
+        /// NAs the udio stop.
+        /// </summary>
+        private void NAudioStop()
+        {
+            // Reset output device
+            if (this.outputDevice != null)
+            {
+                // Set the stop flag
+                this.stopFlag = true;
+
+                // Stop the device
+                this.outputDevice.Stop();
+            }
         }
 
         /// <summary>
@@ -482,6 +508,9 @@ namespace TIMP
             // Check if must exit immediately
             if (this.stopFlag)
             {
+                // Reset the stop flag
+                this.stopFlag = false;
+
                 // Halt flow
                 return;
             }
