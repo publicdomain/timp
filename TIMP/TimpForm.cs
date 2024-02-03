@@ -44,17 +44,6 @@ namespace TIMP
         /// </summary>
         private AudioFileReader audioFile;
 
-        /// <summary>
-        /// Play back state.
-        /// </summary>
-        private enum PlayBackState
-        {
-            Stopped = 0,
-            Playing = 1,
-            Paused = 2,
-        }
-
-        /// <summary>
         /// The directory path.
         /// </summary>
         private string directoryPath;
@@ -183,7 +172,6 @@ namespace TIMP
 
                                 break;
                         }
-
                     }
                     else
                     {
@@ -222,7 +210,15 @@ namespace TIMP
         /// <returns>The playback state.</returns>
         private PlaybackState GetPlaybackState()
         {
+            // Check fr an output device
+            if (this.outputDevice != null)
+            {
+                // Return the current playback state
+                return this.outputDevice.PlaybackState;
+            }
 
+            // Default return
+            return PlaybackState.Stopped;
         }
 
         /// <summary>
