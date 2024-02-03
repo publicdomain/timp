@@ -37,6 +37,9 @@ namespace TIMP
             // Set TIMP window
             this.timpWindow = new TimpForm(this.notifyIcon, this);
 
+            // Set main form
+            this.MainForm = this.timpWindow;
+
             // Set notify icon
             this.notifyIcon.Icon = this.timpWindow.Icon;
             this.notifyIcon.MouseClick += this.timpWindow.OnMainNotifyIconClick;

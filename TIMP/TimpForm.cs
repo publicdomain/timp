@@ -290,9 +290,6 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
-            //#
-            this.Text = this.playerListBox.SelectedIndex.ToString();
-
             try
             {
                 // Play selected one
@@ -501,7 +498,14 @@ namespace TIMP
             // Check the index is valid
             if (index > -1 && index < this.playerListBox.Items.Count)
             {
-                // Set selected index
+                // Check if it's the same index
+                if (this.playerListBox.SelectedIndex == index)
+                {
+                    // Deselect
+                    this.playerListBox.SelectedIndex = -1;
+                }
+
+                // Set index as selected
                 this.playerListBox.SelectedIndex = index;
             }
         }
@@ -520,7 +524,7 @@ namespace TIMP
             }
 
             // Check for a previous output device
-            if (this.outputDevice != null)
+            if (this.GetPlaybackState() != PlaybackState.Stopped)
             {
                 // Reset NAudio
                 this.NAudioReset();
@@ -551,6 +555,12 @@ namespace TIMP
 
                 // Stop the device
                 this.outputDevice.Stop();
+
+                // Wait until flag is false
+                while (this.stopFlag == true)
+                {
+                    // Loop
+                }
             }
         }
 
@@ -562,10 +572,7 @@ namespace TIMP
             // Check there is an output device
             if (this.outputDevice != null)
             {
-                // 
-
                 // Stop the device
-                this.outputDevice.Stop();
             }
         }
 
@@ -591,9 +598,6 @@ namespace TIMP
                 this.audioFile.Dispose();
                 this.audioFile = null;
             }
-
-            // Reset the stop flag
-            this.stopFlag = false;
         }
 
         /// <summary>
@@ -613,7 +617,7 @@ namespace TIMP
                 return;
             }
 
-            // TODO If nothing is selected, exit function [May be improved, e.g. using the check above]
+            // TODO If nothing is selected, exit the function [May be improved, e.g. using the check above]
             if (this.playerListBox.SelectedIndex == -1)
             {
                 // Halt flow
