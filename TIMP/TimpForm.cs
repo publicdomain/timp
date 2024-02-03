@@ -86,28 +86,35 @@ namespace TIMP
             // Set cancel button
             this.CancelButton = closeButton;
 
-            // Process play command
-            this.ProcessPlayCommand(Environment.GetCommandLineArgs());
+            // Set the arguments
+            string[] args = Environment.GetCommandLineArgs();
+
+            // Check for passed arguments
+            if (args.Length > 1)
+            {
+                // Process play command, skipping the first element / passed exe
+                this.ProcessPlayCommand(args.Skip(1).ToArray());
+            }
         }
 
         /// <summary>
         /// Processes the play command.
         /// </summary>
-        private void ProcessPlayCommand(string[] args)
+        private void ProcessPlayCommand(string[] timpArguments)
         {
             // Check if a directory has been passed for play
-            if (args.Length > 2 && args[1].ToLowerInvariant() == "/play")
+            if (timpArguments.Length > 1 && timpArguments[0].ToLowerInvariant() == "/play")
             {
                 // Check if it's current directory
-                if (args[2].ToLowerInvariant() == "current")
+                if (timpArguments[1].ToLowerInvariant() == "current")
                 {
                     // Process current directory
                     this.ProcessDirectory(Application.StartupPath);
                 }
-                else if (Directory.Exists(args[2])) // Check if directory exists
+                else if (Directory.Exists(timpArguments[1])) // Check if directory exists
                 {
                     // Process passed directory
-                    this.ProcessDirectory(args[2]);
+                    this.ProcessDirectory(timpArguments[1]);
                 }
             }
         }
@@ -115,7 +122,7 @@ namespace TIMP
         /// <summary>
         /// Processes the client message.
         /// </summary>
-        /// <param name="args">Arguments.</param>
+        /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
             // Switch the passed TIMP arguments
@@ -148,18 +155,74 @@ namespace TIMP
                 // Play
                 case "/play":
                     // Check for a single argument
+                    if (timpArguments.Length == 1)
+                    {
+                        // Play action
+                        switch (this.GetPlaybackState())
+                        {
+                            // Playing
+                            case PlaybackState.Playing:
+                                // Do nothing
+                                break;
+
+                            // Paused
+                            case PlaybackState.Paused:
+                                // Resume playback
+                                this.outputDevice.Play();
+
+                                break;
+
+                            // Stopped
+                            case PlaybackState.Stopped:
+                                // Check there's a track selected
+                                if (this.playerListBox.SelectedIndex > -1)
+                                {
+                                    // Play current selection
+                                    this.PlayByIndex(this.playerListBox.SelectedIndex);
+                                }
+
+                                break;
+                        }
+
+                    }
+                    else
+                    {
+                        // Check for an integer/index
+                        if (int.TryParse(timpArguments[1], out int index))
+                        {
+                            // Adjust for human / 1-based
+                            index--;
+
+                            // Play by index
+                            this.PlayByIndex(index);
+                        }
+                        else
+                        {
+                            // Play command
+                            this.ProcessPlayCommand(timpArguments);
+                        }
+                    }
 
                     break;
 
                 // Shuffle
                 case "/shuffle":
-                    // Check for 
+                    // Check for
 
                     break;
 
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// Gets the state of the playback.
+        /// </summary>
+        /// <returns>The playback state.</returns>
+        private PlaybackState GetPlaybackState()
+        {
+
         }
 
         /// <summary>
@@ -231,6 +294,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
+            //#
+            this.Text = this.playerListBox.SelectedIndex.ToString();
+
             try
             {
                 // Play selected one
@@ -436,8 +502,12 @@ namespace TIMP
         /// <param name="index">Index.</param>
         private void PlayByIndex(int index)
         {
-            // Set selected index
-            this.playerListBox.SelectedIndex = index;
+            // Check the index is valid
+            if (index > -1 && index < this.playerListBox.Items.Count)
+            {
+                // Set selected index
+                this.playerListBox.SelectedIndex = index;
+            }
         }
 
         /// <summary>
