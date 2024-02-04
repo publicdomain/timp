@@ -44,6 +44,7 @@ namespace TIMP
         /// </summary>
         private AudioFileReader audioFile;
 
+        /// <summary>
         /// The directory path.
         /// </summary>
         private string directoryPath;
@@ -54,6 +55,10 @@ namespace TIMP
         /// <param name="passedNotifyIcon">Passed notify icon.</param>
         public TimpForm(NotifyIcon passedNotifyIcon, TimpApplicationContext timpApplicationContext)
         {
+            // Open in lower-right corner
+            Rectangle workingArea = Screen.GetWorkingArea(this);
+            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+
             // Set the notify icon
             this.notifyIcon = passedNotifyIcon;
 
@@ -74,16 +79,6 @@ namespace TIMP
 
             // Set cancel button
             this.CancelButton = closeButton;
-
-            // Set the arguments
-            string[] args = Environment.GetCommandLineArgs();
-
-            // Check for passed arguments
-            if (args.Length > 1)
-            {
-                // Process play command, skipping the first element / passed exe
-                this.ProcessPlayCommand(args.Skip(1).ToArray());
-            }
         }
 
         /// <summary>
@@ -228,7 +223,15 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnTimpFormLoad(object sender, EventArgs e)
         {
-            // TODO Add code
+            // Set the arguments
+            string[] args = Environment.GetCommandLineArgs();
+
+            // Check for passed arguments
+            if (args.Length > 1)
+            {
+                // Process play command, skipping the first element / passed exe
+                this.ProcessPlayCommand(args.Skip(1).ToArray());
+            }
         }
 
         /// <summary>
