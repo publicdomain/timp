@@ -229,6 +229,13 @@ namespace TIMP
 
                     break;
 
+                // Hide
+                case "/hide":
+                    // Hide the form
+                    this.Hide();
+
+                    break;
+
                 // Unrecognized
                 default:
 
