@@ -247,6 +247,17 @@ namespace TIMP
 
                     break;
 
+                // Last
+                case "/last":
+                    // Check there is at least one loaded track
+                    if (this.playerListBox.Items.Count > 0)
+                    {
+                        // Play last track
+                        this.PlayByIndex(this.playerListBox.Items.Count - 1);
+                    }
+
+                    break;
+
                 // Unrecognized
                 default:
 
