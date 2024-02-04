@@ -109,9 +109,27 @@ namespace TIMP
         /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
+            //#
+            this.Text = timpArguments[0] + " ProcessClientMessage";
+
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
             {
+                // Open
+                case "/open":
+                    // Open the directory
+                    try
+                    {
+                        this.OpenDirectory();
+                    }
+                    catch (Exception ex)
+                    {
+                        //#
+                        MessageBox.Show(ex.Message);
+                    }
+
+                    break;
+
                 // Exit
                 case "/exit":
                     // Hide tray icon and exit
@@ -220,6 +238,9 @@ namespace TIMP
                     break;
 
                 default:
+                    //#
+                    this.Text = "Default";
+
                     break;
             }
         }
@@ -341,15 +362,8 @@ namespace TIMP
             {
                 // Open folder to populate list box with supported music files
                 case "openFolderToolStripMenuItem":
-                    // Reset selected path
-                    this.folderBrowserDialog.SelectedPath = string.Empty;
-
-                    // Show folder browser dialog
-                    if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
-                    {
-                        // Process selected directory
-                        this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
-                    }
+                    // Open the directory
+                    this.OpenDirectory();
 
                     // Halt flow
                     break;
@@ -372,6 +386,22 @@ namespace TIMP
 
                     // Halt flow
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Opens the directory.
+        /// </summary>
+        private void OpenDirectory()
+        {
+            // Reset selected path
+            this.folderBrowserDialog.SelectedPath = string.Empty;
+
+            // Show folder browser dialog
+            if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
+            {
+                // Process selected directory
+                this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
             }
         }
 
