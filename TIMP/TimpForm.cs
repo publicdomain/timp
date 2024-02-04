@@ -140,6 +140,12 @@ namespace TIMP
 
                     break;
 
+                // Pause
+                case "/pause":
+                    this.NAudioPause();
+
+                    break;
+
                 // Play
                 case "/play":
                     // Check for a single argument
@@ -668,14 +674,15 @@ namespace TIMP
         }
 
         /// <summary>
-        /// NAs the udio play.
+        /// NAs the udio pause.
         /// </summary>
-        private void NAudioPlay()
+        private void NAudioPause()
         {
             // Check there is an output device
-            if (this.outputDevice != null)
+            if (this.outputDevice != null && this.outputDevice.PlaybackState == PlaybackState.Playing)
             {
-                // Stop the device
+                // Pause the device
+                this.outputDevice.Pause();
             }
         }
 
