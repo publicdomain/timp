@@ -191,7 +191,23 @@ namespace TIMP
 
                 // Shuffle
                 case "/shuffle":
-                    // Check for
+                    // Begin the update
+                    this.playerListBox.BeginUpdate();
+
+                    // Get items into list
+                    var filesList = this.playerListBox.Items.Cast<String>().ToList();
+
+                    // Clear previous items
+                    this.playerListBox.Items.Clear();
+
+                    // Shuffle files list
+                    filesList.Shuffle();
+
+                    // Add files to list box
+                    this.playerListBox.Items.AddRange(filesList.ToArray());
+
+                    // End the update
+                    this.playerListBox.EndUpdate();
 
                     break;
 
