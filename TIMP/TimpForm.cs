@@ -115,21 +115,6 @@ namespace TIMP
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
             {
-                // Open
-                case "/open":
-                    // Open the directory
-                    try
-                    {
-                        this.OpenDirectory();
-                    }
-                    catch (Exception ex)
-                    {
-                        //#
-                        MessageBox.Show(ex.Message);
-                    }
-
-                    break;
-
                 // Exit
                 case "/exit":
                     // Hide tray icon and exit
@@ -237,9 +222,8 @@ namespace TIMP
 
                     break;
 
+                // Unrecognized
                 default:
-                    //#
-                    this.Text = "Default";
 
                     break;
             }
@@ -292,12 +276,8 @@ namespace TIMP
                 // Check if it's not visible
                 if (this.Visible == false)
                 {
-                    // Open in lower-right corner
-                    Rectangle workingArea = Screen.GetWorkingArea(this);
-                    this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
-
-                    // Show the form
-                    this.Show();
+                    // Relocate and show
+                    this.RelocateAndShow();
                 }
                 else
                 {
@@ -305,6 +285,19 @@ namespace TIMP
                     this.Hide();
                 }
             }
+        }
+
+        /// <summary>
+        /// Relocates and shows the main form.
+        /// </summary>
+        private void RelocateAndShow()
+        {
+            // Open in lower-right corner
+            Rectangle workingArea = Screen.GetWorkingArea(this);
+            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+
+            // Show the form
+            this.Show();
         }
 
         /// <summary>
@@ -339,6 +332,13 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
+            // TODO Skip no index [Check]
+            if (this.playerListBox.SelectedIndex < 0)
+            {
+                // Halt flow
+                return;
+            }
+
             try
             {
                 // Play selected one
