@@ -211,6 +211,14 @@ namespace TIMP
 
                     break;
 
+                // Sort
+                case "/sort":
+                    // Sort and back
+                    this.playerListBox.Sorted = true;
+                    this.playerListBox.Sorted = false;
+
+                    break;
+
                 default:
                     break;
             }
