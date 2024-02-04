@@ -222,6 +222,13 @@ namespace TIMP
 
                     break;
 
+                // Show
+                case "/show":
+                    // Relocate and show the form
+                    this.RelocateAndShow();
+
+                    break;
+
                 // Unrecognized
                 default:
 
