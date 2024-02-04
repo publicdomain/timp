@@ -17,17 +17,17 @@ namespace TIMP
         /// <summary>
         /// The notify icon.
         /// </summary>
-        NotifyIcon notifyIcon = new NotifyIcon();
+        public NotifyIcon notifyIcon = new NotifyIcon();
 
         /// <summary>
         /// The timp window.
         /// </summary>
-        TimpForm timpWindow;
+        private TimpForm timpWindow;
 
         /// <summary>
         /// The server.
         /// </summary>
-        NamedPipeServer<Arguments> server = new NamedPipeServer<Arguments>("TimpServerPipe");
+        private NamedPipeServer<Arguments> server = new NamedPipeServer<Arguments>("TimpServerPipe");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpApplicationContext"/> class.
@@ -35,7 +35,7 @@ namespace TIMP
         public TimpApplicationContext()
         {
             // Set TIMP window
-            this.timpWindow = new TimpForm(this.notifyIcon, this);
+            this.timpWindow = new TimpForm(this);
 
             // Set main form
             this.MainForm = this.timpWindow;

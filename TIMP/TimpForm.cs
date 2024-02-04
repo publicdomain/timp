@@ -52,15 +52,15 @@ namespace TIMP
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
-        /// <param name="passedNotifyIcon">Passed notify icon.</param>
-        public TimpForm(NotifyIcon passedNotifyIcon, TimpApplicationContext timpApplicationContext)
+        /// <param name="timpApplicationContext">Timp application context.</param>
+        public TimpForm(TimpApplicationContext timpApplicationContext)
         {
             // Open in lower-right corner
             Rectangle workingArea = Screen.GetWorkingArea(this);
             this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
 
             // Set the notify icon
-            this.notifyIcon = passedNotifyIcon;
+            this.notifyIcon = timpApplicationContext.notifyIcon;
 
             // Set the TIMP application context 
             this.timpApplicationContext = timpApplicationContext;
@@ -114,7 +114,8 @@ namespace TIMP
             {
                 // Exit
                 case "/exit":
-                    this.timpApplicationContext.ExitThread();
+                    // Hide tray icon and exit
+                    this.ExitTimp();
 
                     break;
 
@@ -331,14 +332,8 @@ namespace TIMP
 
                 // Exit
                 case "exitToolStripMenuItem":
-                    // Set close flag
-                    this.closeFlag = true;
-
-                    // Hide tray icon
-                    this.notifyIcon.Visible = false;
-
-                    // Exit application
-                    Application.Exit();
+                    // Hide tray icon and exit
+                    this.ExitTimp();
 
                     // Halt flow
                     break;
@@ -354,6 +349,21 @@ namespace TIMP
                     // Halt flow
                     break;
             }
+        }
+
+        /// <summary>
+        /// Exits the timp.
+        /// </summary>
+        private void ExitTimp()
+        {
+            // Set close flag
+            this.closeFlag = true;
+
+            // Hide tray icon
+            this.notifyIcon.Visible = false;
+
+            // Exit application
+            this.timpApplicationContext.ExitThread();
         }
 
         /// <summary>
