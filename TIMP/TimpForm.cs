@@ -236,6 +236,17 @@ namespace TIMP
 
                     break;
 
+                // First
+                case "/first":
+                    // Check there is at least one loaded track
+                    if (this.playerListBox.Items.Count > 0)
+                    {
+                        // Play first track
+                        this.PlayByIndex(0);
+                    }
+
+                    break;
+
                 // Unrecognized
                 default:
 
