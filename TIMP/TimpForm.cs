@@ -109,9 +109,6 @@ namespace TIMP
         /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
-            //#
-            this.Text = timpArguments[0] + " ProcessClientMessage";
-
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
             {
@@ -151,32 +148,8 @@ namespace TIMP
                     // Check for a single argument
                     if (timpArguments.Length == 1)
                     {
-                        // Play action
-                        switch (this.GetPlaybackState())
-                        {
-                            // Playing
-                            case PlaybackState.Playing:
-                                // Do nothing
-                                break;
-
-                            // Paused
-                            case PlaybackState.Paused:
-                                // Resume playback
-                                this.outputDevice.Play();
-
-                                break;
-
-                            // Stopped
-                            case PlaybackState.Stopped:
-                                // Check there's a track selected
-                                if (this.playerListBox.SelectedIndex > -1)
-                                {
-                                    // Play current selection
-                                    this.PlayByIndex(this.playerListBox.SelectedIndex);
-                                }
-
-                                break;
-                        }
+                        // Trigger play action
+                        this.PlayPause(true);
                     }
                     else
                     {
@@ -195,6 +168,13 @@ namespace TIMP
                             this.ProcessPlayCommand(timpArguments);
                         }
                     }
+
+                    break;
+
+                // Play/Pause
+                case "/playpause":
+                    // Trigger with pause
+                    this.PlayPause(false);
 
                     break;
 
@@ -266,6 +246,46 @@ namespace TIMP
 
                 // Unrecognized
                 default:
+
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Plaies the pause.
+        /// </summary>
+        /// <param name="isPlay">If set to <c>true</c> is play.</param>
+        private void PlayPause(bool isPlay)
+        {
+            // Play action
+            switch (this.GetPlaybackState())
+            {
+                // Playing
+                case PlaybackState.Playing:
+                    // Check for pause
+                    if (!isPlay)
+                    {
+                        // Pause playback
+                        this.outputDevice.Pause();
+                    }
+
+                    break;
+
+                // Paused
+                case PlaybackState.Paused:
+                    // Resume playback
+                    this.outputDevice.Play();
+
+                    break;
+
+                // Stopped
+                case PlaybackState.Stopped:
+                    // Check there's a track selected
+                    if (this.playerListBox.SelectedIndex > -1)
+                    {
+                        // Play current selection
+                        this.PlayByIndex(this.playerListBox.SelectedIndex);
+                    }
 
                     break;
             }
