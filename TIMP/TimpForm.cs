@@ -776,7 +776,17 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnSelectToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            // Set tool strip menu item
+            ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
 
+            // Uncheck all
+            foreach (ToolStripMenuItem dropDownItem in ((ToolStripMenuItem)sender).DropDownItems)
+            {
+                dropDownItem.Checked = false;
+            }
+
+            // Check clicked menu item
+            toolStripMenuItem.Checked = true;
         }
 
         /// <summary>
