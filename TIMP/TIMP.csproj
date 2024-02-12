@@ -69,6 +69,7 @@
     <None Include="Resources\NAudio.dll" />
     <None Include="Resources\publicdomain.is_7-8-vista-xp.ico" />
     <None Include="packages.config" />
+    <None Include="Resources\ent_screen02.wav" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TimpForm.resx">

@@ -68,11 +68,6 @@ namespace TIMP
             // The InitializeComponent() call is required for Windows Forms designer support.
             this.InitializeComponent();
 
-            //# Hide hotkeys menu item [To be implemented]
-            this.usehotkeysToolStripMenuItem.Visible = false;
-            //# Hide autoplay menu item [To be implemented]
-            this.autoplayToolStripMenuItem.Visible = false;
-
             // The invisible button
             Button closeButton = new Button();
             closeButton.Click += OnCloseButtonClick;
@@ -419,7 +414,7 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnNotifyIconContextMenuStripItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            // Switch the menu items
+            /*// Switch the menu items
             switch (e.ClickedItem.Name)
             {
                 // Open folder to populate list box with supported music files
@@ -448,7 +443,7 @@ namespace TIMP
 
                     // Halt flow
                     break;
-            }
+            }*/
         }
 
         /// <summary>
@@ -507,7 +502,7 @@ namespace TIMP
                 //this.NAudioReset();
 
                 // Check if must shuffle
-                if (this.randomizeToolStripMenuItem.Checked)
+                if (this.shuffledToolStripMenuItem.Checked)
                 {
                     // Shuffle files list
                     filesList.Shuffle();
@@ -758,6 +753,50 @@ namespace TIMP
                 // Play the next one
                 this.PlayNext();
             }
+        }
+
+        /// <summary>
+        /// Handles the toggle tool strip menu item drop down item clicked.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnToggleToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            // Set tool strip menu item
+            ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
+
+            // Toggle checked
+            toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
+        }
+
+        /// <summary>
+        /// Handles the select tool strip menu item drop down item clicked.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnSelectToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the open folder tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnOpenFolderToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the exit tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnExitToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
         }
     }
 }
