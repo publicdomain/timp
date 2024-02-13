@@ -219,12 +219,8 @@ namespace TIMP
 
                 // First
                 case "/first":
-                    // Check there is at least one loaded track
-                    if (this.playerListView.Items.Count > 0)
-                    {
-                        // Play first track
-                        this.PlayByIndex(0);
-                    }
+                    // Play first track
+                    this.PlayFirst();
 
                     break;
 
@@ -247,7 +243,20 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Plaies the pause.
+        /// Plays the first track.
+        /// </summary>
+        private void PlayFirst()
+        {
+            // Check there is at least one loaded track
+            if (this.playerListView.Items.Count > 0)
+            {
+                // Play first track
+                this.PlayByIndex(0);
+            }
+        }
+
+        /// <summary>
+        /// Triggers play or pause
         /// </summary>
         /// <param name="isPlay">If set to <c>true</c> is play.</param>
         private void PlayPause(bool isPlay)
