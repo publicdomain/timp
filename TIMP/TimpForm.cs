@@ -310,6 +310,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnTimpFormLoad(object sender, EventArgs e)
         {
+            // Relocate and hide the form
+            this.RelocateAndHide();
+
             // Set the arguments
             string[] args = Environment.GetCommandLineArgs();
 
@@ -342,6 +345,19 @@ namespace TIMP
                     this.Hide();
                 }
             }
+        }
+
+        /// <summary>
+        /// and relocates the main form.
+        /// </summary>
+        private void RelocateAndHide()
+        {
+            // Open in lower-right corner
+            Rectangle workingArea = Screen.GetWorkingArea(this);
+            this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
+
+            // Hide the form
+            this.Hide();
         }
 
         /// <summary>
