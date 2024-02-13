@@ -176,30 +176,30 @@ namespace TIMP
                 // Shuffle
                 case "/shuffle":
                     // Begin the update
-                    this.playerListBox.BeginUpdate();
+                    this.playerListView.BeginUpdate();
 
                     // Get items into list
-                    var filesList = this.playerListBox.Items.Cast<String>().ToList();
+                    var filesList = this.playerListView.Items.Cast<String>().ToList();
 
                     // Clear previous items
-                    this.playerListBox.Items.Clear();
+                    this.playerListView.Items.Clear();
 
                     // Shuffle files list
                     filesList.Shuffle();
 
                     // Add files to list box
-                    this.playerListBox.Items.AddRange(filesList.ToArray());
+                    /*#this.playerListView.Items.AddRange(filesList.ToArray());#*/
 
                     // End the update
-                    this.playerListBox.EndUpdate();
+                    this.playerListView.EndUpdate();
 
                     break;
 
                 // Sort
                 case "/sort":
                     // Sort and back
-                    this.playerListBox.Sorted = true;
-                    this.playerListBox.Sorted = false;
+                    /*#this.playerListView.Sorted = true;
+                    this.playerListView.Sorted = false;#*/
 
                     break;
 
@@ -220,7 +220,7 @@ namespace TIMP
                 // First
                 case "/first":
                     // Check there is at least one loaded track
-                    if (this.playerListBox.Items.Count > 0)
+                    if (this.playerListView.Items.Count > 0)
                     {
                         // Play first track
                         this.PlayByIndex(0);
@@ -231,10 +231,10 @@ namespace TIMP
                 // Last
                 case "/last":
                     // Check there is at least one loaded track
-                    if (this.playerListBox.Items.Count > 0)
+                    if (this.playerListView.Items.Count > 0)
                     {
                         // Play last track
-                        this.PlayByIndex(this.playerListBox.Items.Count - 1);
+                        this.PlayByIndex(this.playerListView.Items.Count - 1);
                     }
 
                     break;
@@ -276,10 +276,10 @@ namespace TIMP
                 // Stopped
                 case PlaybackState.Stopped:
                     // Check there's a track selected
-                    if (this.playerListBox.SelectedIndex > -1)
+                    if (this.playerListView.SelectedIndices.Count > 0)
                     {
                         // Play current selection
-                        this.PlayByIndex(this.playerListBox.SelectedIndex);
+                        this.PlayByIndex(this.playerListView.SelectedIndices[0]);
                     }
 
                     break;
@@ -390,7 +390,7 @@ namespace TIMP
         private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             // TODO Skip no index [Check]
-            if (this.playerListBox.SelectedIndex < 0)
+            if (this.playerListView.SelectedIndices.Count == 0)
             {
                 // Halt flow
                 return;
@@ -399,7 +399,7 @@ namespace TIMP
             try
             {
                 // Play selected one
-                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListBox.Items[this.playerListBox.SelectedIndex].ToString()));
+                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListView.SelectedItems[0].Tag.ToString()));
             }
             catch (Exception ex)
             {
@@ -496,7 +496,7 @@ namespace TIMP
                 List<string> filesList = files.Select(f => f.Name).ToList();
 
                 // Clear previous items
-                this.playerListBox.Items.Clear();
+                this.playerListView.Items.Clear();
 
                 // Reset current player
                 //this.NAudioReset();
@@ -508,8 +508,20 @@ namespace TIMP
                     filesList.Shuffle();
                 }
 
-                // Add files to list box
-                this.playerListBox.Items.AddRange(filesList.ToArray());
+                /* Add files to list box */
+
+                for (int i = 0; i < filesList.Count; i++)
+                {
+                    // Set the item
+                    var item = new ListViewItem(new[] { Path.GetFileNameWithoutExtension(filesList[i]), string.Empty, string.Empty })
+                    {
+                        // Set the tag
+                        Tag = filesList[i]
+                    };
+
+                    // Add to listview
+                    this.playerListView.Items.Add(item);
+                }
 
                 // Check if must autoplay
                 if (this.autoplayToolStripMenuItem.Checked)
@@ -524,6 +536,8 @@ namespace TIMP
                         // TODO Log to file
                     }
                 }
+
+                // Process file tags to populate listview
             }
         }
 
@@ -543,24 +557,24 @@ namespace TIMP
         private void PlayPrev()
         {
             // If nothing is selected, exit function
-            if (this.playerListBox.SelectedIndex == -1)
+            if (this.playerListView.SelectedIndices.Count == 0)
             {
                 // Halt flow
                 return;
             }
-            else if (this.playerListBox.SelectedIndex == 0) // Check for the firt one
+            else if (this.playerListView.SelectedIndices[0] == 0) // Check for the firt one
             {
                 // Check if must loop
-                if (this.loopToolStripMenuItem.Checked)
+                if (this.looplistToolStripMenuItem.Checked)
                 {
                     // Loop play / Play and select last one
-                    this.PlayByIndex(this.playerListBox.Items.Count - 1);
+                    this.PlayByIndex(this.playerListView.Items.Count - 1);
                 }
             }
             else
             {
                 // Play the previous one
-                this.PlayByIndex(this.playerListBox.SelectedIndex - 1);
+                this.PlayByIndex(this.playerListView.SelectedIndices[0] - 1);
             }
         }
 
@@ -570,12 +584,12 @@ namespace TIMP
         private void PlayNext()
         {
             // If nothing is selected, exit function
-            if (this.playerListBox.SelectedIndex == -1)
+            if (this.playerListView.SelectedIndices.Count == 0)
             {
                 // Halt flow
                 return;
             }
-            else if (this.playerListBox.SelectedIndex == this.playerListBox.Items.Count - 1) // Check for the last one
+            else if (this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1) // Check for the last one
             {
                 // Check if must loop
                 if (this.loopToolStripMenuItem.Checked)
@@ -587,15 +601,15 @@ namespace TIMP
             else
             {
                 // Play the next one
-                this.PlayByIndex(this.playerListBox.SelectedIndex + 1);
+                this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
             }
         }
 
         /// <summary>
         /// Handles the player list box mouse click.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnPlayerListBoxMouseClick(object sender, MouseEventArgs e)
         {
             // TODO Use or remove
@@ -604,7 +618,7 @@ namespace TIMP
             if (e.Button == MouseButtons.Left)
             {
                 // Play selected
-                this.PlayByIndex(this.playerListBox.SelectedIndex);
+                this.PlayByIndex(this.playerListView.SelectedIndex);
             }*/
         }
 
@@ -620,17 +634,17 @@ namespace TIMP
         private void PlayByIndex(int index)
         {
             // Check the index is valid
-            if (index > -1 && index < this.playerListBox.Items.Count)
+            if (index > -1 && index < this.playerListView.Items.Count)
             {
                 // Check if it's the same index
-                if (this.playerListBox.SelectedIndex == index)
+                if (this.playerListView.SelectedIndices[0] == index)
                 {
                     // Deselect
-                    this.playerListBox.SelectedIndex = -1;
+                    this.playerListView.Items[index].Selected = false;
                 }
 
                 // Set index as selected
-                this.playerListBox.SelectedIndex = index;
+                this.playerListView.Items[index].Selected = true;
             }
         }
 
@@ -726,9 +740,9 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Ons the playback stopped.
+        /// Handles the playback stopped.
         /// </summary>
-        /// <param name="sender">Sender.</param>
+        /// <param name="sender">Sender object.</param>
         /// <param name="args">Arguments.</param>
         private void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
@@ -743,7 +757,7 @@ namespace TIMP
             }
 
             // TODO If nothing is selected, exit the function [May be improved, e.g. using the check above]
-            if (this.playerListBox.SelectedIndex == -1)
+            if (this.playerListView.SelectedIndices.Count == 0)
             {
                 // Halt flow
                 return;
@@ -796,7 +810,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnOpenFolderToolStripMenuItemClick(object sender, EventArgs e)
         {
-
+            // Open the directory
+            this.OpenDirectory();
         }
 
         /// <summary>
@@ -805,6 +820,126 @@ namespace TIMP
         /// <param name="sender">Sender object.</param>
         /// <param name="e">Event arguments.</param>
         private void OnExitToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the actions tool strip menu item drop down item clicked.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnActionsToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the play time track bar scroll.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnPlayTimeTrackBarScroll(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the hide button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnHideButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the sort shuffle check box checked changed.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnSortShuffleCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the first button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnFirstButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the previous button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnPreviousButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the play pause button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnPlayPauseButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the next button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnNextButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the last button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnLastButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the loop mode check box checked changed.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnLoopModeCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the exit button click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnExitButtonClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the player list view selected index changed.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnPlayerListViewSelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

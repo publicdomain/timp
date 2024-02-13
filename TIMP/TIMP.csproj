@@ -70,6 +70,15 @@
     <None Include="Resources\publicdomain.is_7-8-vista-xp.ico" />
     <None Include="packages.config" />
     <None Include="Resources\ent_screen02.wav" />
+    <None Include="Resources\Shutdown B.ico" />
+    <None Include="Resources\sort.ico" />
+    <None Include="Resources\t Exit.ico" />
+    <None Include="Resources\t hide.ico" />
+    <None Include="Resources\T loop song.ico" />
+    <None Include="Resources\t next.ico" />
+    <None Include="Resources\T playlast.ico" />
+    <None Include="Resources\t playpause.ico" />
+    <None Include="Resources\t previous.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TimpForm.resx">
