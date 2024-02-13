@@ -383,31 +383,6 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Handles the player list box selected index changed.
-        /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void OnPlayerListBoxSelectedIndexChanged(object sender, EventArgs e)
-        {
-            // TODO Skip no index [Check]
-            if (this.playerListView.SelectedIndices.Count == 0)
-            {
-                // Halt flow
-                return;
-            }
-
-            try
-            {
-                // Play selected one
-                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListView.SelectedItems[0].Tag.ToString()));
-            }
-            catch (Exception ex)
-            {
-                // TODO Log
-            }
-        }
-
-        /// <summary>
         /// Handles the notify icon context menu strip item clicked.
         /// </summary>
         /// <param name="sender">Sender object.</param>
@@ -578,19 +553,26 @@ namespace TIMP
                 // Halt flow
                 return;
             }
-            else if (this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1) // Check for the last one
+
+            // Check for auto-play
+            if (this.autoplayToolStripMenuItem.Checked)
             {
-                // Check if must loop
-                if (this.loopToolStripMenuItem.Checked)
+                // Check if must play the same song
+                if (this.looponeToolStripMenuItem.Checked)
                 {
-                    // Loop play / Play and select first one
+                    // Loop the same song
+                    this.PlayByIndex(this.playerListView.SelectedIndices[0]);
+                } // Check for the last one
+                else if (this.looplistToolStripMenuItem.Checked && this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1)
+                {
+                    // Loop list / Play the first one
                     this.PlayByIndex(0);
+                } // No loop
+                else
+                {
+                    // Play the next one
+                    this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
                 }
-            }
-            else
-            {
-                // Play the next one
-                this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
             }
         }
 
@@ -929,7 +911,22 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListViewSelectedIndexChanged(object sender, EventArgs e)
         {
+            // TODO Skip no index [Check]
+            if (this.playerListView.SelectedIndices.Count == 0)
+            {
+                // Halt flow
+                return;
+            }
 
+            try
+            {
+                // Play selected one
+                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListView.SelectedItems[0].Tag.ToString()));
+            }
+            catch (Exception ex)
+            {
+                // TODO Log
+            }
         }
     }
 }
