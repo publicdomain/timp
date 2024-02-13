@@ -219,19 +219,15 @@ namespace TIMP
 
                 // First
                 case "/first":
-                    // Play first track
+                    // Play the first track
                     this.PlayFirst();
 
                     break;
 
                 // Last
                 case "/last":
-                    // Check there is at least one loaded track
-                    if (this.playerListView.Items.Count > 0)
-                    {
-                        // Play last track
-                        this.PlayByIndex(this.playerListView.Items.Count - 1);
-                    }
+                    // Play the last track
+                    this.PlayLast();
 
                     break;
 
@@ -252,6 +248,19 @@ namespace TIMP
             {
                 // Play first track
                 this.PlayByIndex(0);
+            }
+        }
+
+        /// <summary>
+        /// Plays the last track.
+        /// </summary>
+        private void PlayLast()
+        {
+            // Check there is at least one loaded track
+            if (this.playerListView.Items.Count > 0)
+            {
+                // Play last track
+                this.PlayByIndex(this.playerListView.Items.Count - 1);
             }
         }
 
