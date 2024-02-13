@@ -414,7 +414,7 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnNotifyIconContextMenuStripItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            /*// Switch the menu items
+            // Switch the menu items
             switch (e.ClickedItem.Name)
             {
                 // Open folder to populate list box with supported music files
@@ -432,18 +432,7 @@ namespace TIMP
 
                     // Halt flow
                     break;
-
-                // Toggle check status
-                default:
-                    // Set the clicked item
-                    ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
-
-                    // Toggle check state
-                    toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
-
-                    // Halt flow
-                    break;
-            }*/
+            }
         }
 
         /// <summary>
@@ -810,8 +799,7 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnOpenFolderToolStripMenuItemClick(object sender, EventArgs e)
         {
-            // Open the directory
-            this.OpenDirectory();
+
         }
 
         /// <summary>

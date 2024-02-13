@@ -359,7 +359,10 @@ namespace TIMP
 									this.durationColumnHeader,
 									this.artistColumnHeader});
 			this.playerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.playerListView.FullRowSelect = true;
+			this.playerListView.GridLines = true;
 			this.playerListView.Location = new System.Drawing.Point(3, 3);
+			this.playerListView.MultiSelect = false;
 			this.playerListView.Name = "playerListView";
 			this.playerListView.Size = new System.Drawing.Size(378, 175);
 			this.playerListView.TabIndex = 9;
