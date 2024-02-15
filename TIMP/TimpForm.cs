@@ -95,6 +95,9 @@ namespace TIMP
                     // Process passed directory
                     this.ProcessDirectory(timpArguments[1]);
                 }
+
+                // Play the first track
+                this.PlayFirst();
             }
         }
 
@@ -457,6 +460,9 @@ namespace TIMP
             {
                 // Process selected directory
                 this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
+
+                // Play the first track
+                this.PlayFirst();
             }
         }
 
@@ -482,7 +488,7 @@ namespace TIMP
         private void ProcessDirectory(string passedDirectoryPath)
         {
             // Set files by extension
-            FileInfo[] files = new DirectoryInfo(passedDirectoryPath).EnumerateFiles("*.*", SearchOption.TopDirectoryOnly).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
+            FileInfo[] files = new DirectoryInfo(passedDirectoryPath).EnumerateFiles("*.*", this.scansubdirectoriesToolStripMenuItem.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).Where(file => new string[] { ".mp3", ".wav", ".aif" }.Contains(file.Extension.ToLower())).ToArray();
 
             // Check there are files
             if (files.Length > 0)
@@ -491,7 +497,7 @@ namespace TIMP
                 this.directoryPath = passedDirectoryPath;
 
                 // Set files list
-                List<string> filesList = files.Select(f => f.Name).ToList();
+                List<string> filesList = files.Select(f => f.FullName).ToList();
 
                 // Clear previous items
                 this.playerListView.Items.Clear();
@@ -521,20 +527,6 @@ namespace TIMP
                     this.playerListView.Items.Add(item);
                 }
 
-                // Check if must autoplay
-                if (this.autoplayToolStripMenuItem.Checked)
-                {
-                    try
-                    {
-                        // Play first file
-                        this.PlayByIndex(0);
-                    }
-                    catch (Exception ex)
-                    {
-                        // TODO Log to file
-                    }
-                }
-
                 // Process file tags to populate listview
             }
         }
@@ -560,7 +552,9 @@ namespace TIMP
                 // Halt flow
                 return;
             }
-            else if (this.playerListView.SelectedIndices[0] == 0) // Check for the firt one
+
+            // Check for the first one
+            if (this.playerListView.SelectedIndices[0] == 0)
             {
                 // Check if must loop
                 if (this.looplistToolStripMenuItem.Checked)
@@ -608,28 +602,6 @@ namespace TIMP
                     this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
                 }
             }
-        }
-
-        /// <summary>
-        /// Handles the player list box mouse click.
-        /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void OnPlayerListBoxMouseClick(object sender, MouseEventArgs e)
-        {
-            // TODO Use or remove
-
-            /*// Check for left click
-            if (e.Button == MouseButtons.Left)
-            {
-                // Play selected
-                this.PlayByIndex(this.playerListView.SelectedIndex);
-            }*/
-        }
-
-        void OnPlayerListBoxMouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            // TODO Use or remove
         }
 
         /// <summary>
@@ -762,7 +734,7 @@ namespace TIMP
             }
 
             // TODO If nothing is selected, exit the function [May be improved, e.g. using the check above]
-            if (this.playerListView.SelectedIndices.Count == 0)
+            if (this.playerListView.SelectedItems.Count == 0)
             {
                 // Halt flow
                 return;
@@ -945,8 +917,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListViewSelectedIndexChanged(object sender, EventArgs e)
         {
-            // TODO Skip no index [Check]
-            if (this.playerListView.SelectedIndices.Count == 0)
+            // Skip if nothing is selected
+            if (this.playerListView.SelectedItems.Count == 0)
             {
                 // Halt flow
                 return;
@@ -954,13 +926,43 @@ namespace TIMP
 
             try
             {
-                // Play selected one
-                this.NAudioPlayNew(Path.Combine(this.directoryPath, this.playerListView.SelectedItems[0].Tag.ToString()));
+                // Play selected item
+                this.NAudioPlayNew(Path.Combine(this.playerListView.SelectedItems[0].Tag.ToString()));
             }
             catch (Exception ex)
             {
                 // TODO Log
             }
+        }
+
+        /// <summary>
+        /// Handles the original thread donation codercom tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnOriginalThreadDonationCodercomToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the source code githubcom tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnSourceCodeGithubcomToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the about tool strip menu item click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnAboutToolStripMenuItemClick(object sender, EventArgs e)
+        {
+
         }
     }
 }
