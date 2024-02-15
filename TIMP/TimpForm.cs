@@ -234,6 +234,27 @@ namespace TIMP
 
                     break;
 
+                // Loop one
+                case "/loopone":
+                    // Click the menu item
+                    this.looponeToolStripMenuItem.PerformClick();
+
+                    break;
+
+                // Loop list
+                case "/looplist":
+                    // Click the menu item
+                    this.looplistToolStripMenuItem.PerformClick();
+
+                    break;
+
+                // No loop
+                case "/noloop":
+                    // Click the menu item
+                    this.noLoopToolStripMenuItem.PerformClick();
+
+                    break;
+
                 // Unrecognized
                 default:
 
@@ -591,14 +612,18 @@ namespace TIMP
                     // Loop the same song
                     this.PlayByIndex(this.playerListView.SelectedIndices[0]);
                 } // Check for the last one
-                else if (this.looplistToolStripMenuItem.Checked && this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1)
+                else if (this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1)
                 {
-                    // Loop list / Play the first one
-                    this.PlayByIndex(0);
+                    // Check if must loop the list 
+                    if (this.looplistToolStripMenuItem.Checked)
+                    {
+                        // Loop list / Play the first one
+                        this.PlayByIndex(0);
+                    } // Else, no list loop == no further play
                 } // No loop
                 else
                 {
-                    // Play the next one
+                    // Play the next one if not at the en d of the list
                     this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
                 }
             }
@@ -778,6 +803,32 @@ namespace TIMP
 
             // Check clicked menu item
             toolStripMenuItem.Checked = true;
+
+            /* Handle post-select operations */
+
+            switch (toolStripMenuItem.Name)
+            {
+                // Loop list
+                case "looplistToolStripMenuItem":
+                    // Set check state
+                    this.loopModeCheckBox.CheckState = CheckState.Checked;
+
+                    break;
+
+                // Loop one
+                case "looponeToolStripMenuItem":
+                    // Set check state
+                    this.loopModeCheckBox.CheckState = CheckState.Indeterminate;
+
+                    break;
+
+                // No loop
+                case "noLoopToolStripMenuItem":
+                    // Set check state
+                    this.loopModeCheckBox.CheckState = CheckState.Unchecked;
+
+                    break;
+            }
         }
 
         /// <summary>
