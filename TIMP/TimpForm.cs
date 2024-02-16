@@ -50,6 +50,16 @@ namespace TIMP
         private string directoryPath;
 
         /// <summary>
+        /// The track list.
+        /// </summary>
+        private List<ListViewItem> trackList = new List<ListViewItem>();
+
+        /// <summary>
+        /// The index of the track.
+        /// </summary>
+        private int trackIndex = -1;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="timpApplicationContext">Timp application context.</param>
@@ -555,6 +565,18 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Clears the items.
+        /// </summary>
+        private void ClearItems()
+        {
+            // Clear track list
+            this.trackList.Clear();
+
+            // Add to listview
+            this.playerListView.Items.Clear();
+        }
+
+        /// <summary>
         /// Adds the item.
         /// </summary>
         /// <param name="itemPath">Item path.</param>
@@ -571,14 +593,20 @@ namespace TIMP
             this.playerListView.Items.Add(item);
         }
 
-        void OnPlayerListBoxClick(object sender, EventArgs e)
+        /// <summary>
+        /// Sorts the items.
+        /// </summary>
+        private void SortItems()
         {
-            // TODO Use or remove
+
         }
 
-        void OnPlayerListBoxDoubleClick(object sender, EventArgs e)
+        /// <summary>
+        /// Shuffles the items.
+        /// </summary>
+        private void ShuffleItems()
         {
-            // TODO Use or remove
+
         }
 
         /// <summary>
