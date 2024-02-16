@@ -89,11 +89,11 @@ namespace TIMP
         	this.sortShuffleCheckBox = new System.Windows.Forms.CheckBox();
         	this.loopModeCheckBox = new System.Windows.Forms.CheckBox();
         	this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-        	this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tracksTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tracksToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
         	this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.toolStripStatusLabel4 = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.toolStripStatusLabel5 = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tipTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tipToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
         	this.notifyIconContextMenuStrip.SuspendLayout();
         	this.tableLayoutPanel1.SuspendLayout();
         	this.tableLayoutPanel2.SuspendLayout();
@@ -405,6 +405,8 @@ namespace TIMP
         	this.playerListView.UseCompatibleStateImageBehavior = false;
         	this.playerListView.View = System.Windows.Forms.View.Details;
         	this.playerListView.SelectedIndexChanged += new System.EventHandler(this.OnPlayerListViewSelectedIndexChanged);
+        	this.playerListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnPlayerListViewMouseClick);
+        	this.playerListView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnPlayerListViewMouseDown);
         	// 
         	// titleColumnHeader
         	// 
@@ -462,10 +464,12 @@ namespace TIMP
         	// 
         	this.playTimeTrackBar.Dock = System.Windows.Forms.DockStyle.Fill;
         	this.playTimeTrackBar.Location = new System.Drawing.Point(53, 3);
+        	this.playTimeTrackBar.Maximum = 100;
         	this.playTimeTrackBar.Name = "playTimeTrackBar";
         	this.playTimeTrackBar.Size = new System.Drawing.Size(278, 29);
         	this.playTimeTrackBar.TabIndex = 10;
         	this.playTimeTrackBar.Scroll += new System.EventHandler(this.OnPlayTimeTrackBarScroll);
+        	this.playTimeTrackBar.ValueChanged += new System.EventHandler(this.OnPlayTimeTrackBarValueChanged);
         	// 
         	// tableLayoutPanel3
         	// 
@@ -508,6 +512,8 @@ namespace TIMP
         	this.hideButton.TabIndex = 7;
         	this.hideButton.UseVisualStyleBackColor = true;
         	this.hideButton.Click += new System.EventHandler(this.OnHideButtonClick);
+        	this.hideButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.hideButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// firstButton
         	// 
@@ -520,6 +526,8 @@ namespace TIMP
         	this.firstButton.TabIndex = 3;
         	this.firstButton.UseVisualStyleBackColor = true;
         	this.firstButton.Click += new System.EventHandler(this.OnFirstButtonClick);
+        	this.firstButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.firstButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// previousButton
         	// 
@@ -532,6 +540,8 @@ namespace TIMP
         	this.previousButton.TabIndex = 1;
         	this.previousButton.UseVisualStyleBackColor = true;
         	this.previousButton.Click += new System.EventHandler(this.OnPreviousButtonClick);
+        	this.previousButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.previousButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// playPauseButton
         	// 
@@ -544,6 +554,8 @@ namespace TIMP
         	this.playPauseButton.TabIndex = 0;
         	this.playPauseButton.UseVisualStyleBackColor = true;
         	this.playPauseButton.Click += new System.EventHandler(this.OnPlayPauseButtonClick);
+        	this.playPauseButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.playPauseButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// nextButton
         	// 
@@ -556,6 +568,8 @@ namespace TIMP
         	this.nextButton.TabIndex = 2;
         	this.nextButton.UseVisualStyleBackColor = true;
         	this.nextButton.Click += new System.EventHandler(this.OnNextButtonClick);
+        	this.nextButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.nextButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// lastButton
         	// 
@@ -568,6 +582,8 @@ namespace TIMP
         	this.lastButton.TabIndex = 4;
         	this.lastButton.UseVisualStyleBackColor = true;
         	this.lastButton.Click += new System.EventHandler(this.OnLastButtonClick);
+        	this.lastButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.lastButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// exitButton
         	// 
@@ -581,6 +597,8 @@ namespace TIMP
         	this.exitButton.Text = "button9";
         	this.exitButton.UseVisualStyleBackColor = true;
         	this.exitButton.Click += new System.EventHandler(this.OnExitButtonClick);
+        	this.exitButton.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.exitButton.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// sortShuffleCheckBox
         	// 
@@ -594,6 +612,8 @@ namespace TIMP
         	this.sortShuffleCheckBox.TabIndex = 5;
         	this.sortShuffleCheckBox.UseVisualStyleBackColor = true;
         	this.sortShuffleCheckBox.CheckedChanged += new System.EventHandler(this.OnSortShuffleCheckBoxCheckedChanged);
+        	this.sortShuffleCheckBox.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.sortShuffleCheckBox.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// loopModeCheckBox
         	// 
@@ -608,33 +628,35 @@ namespace TIMP
         	this.loopModeCheckBox.ThreeState = true;
         	this.loopModeCheckBox.UseVisualStyleBackColor = true;
         	this.loopModeCheckBox.CheckedChanged += new System.EventHandler(this.OnLoopModeCheckBoxCheckedChanged);
+        	this.loopModeCheckBox.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
+        	this.loopModeCheckBox.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 
         	// statusStrip1
         	// 
         	this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-        	        	        	this.toolStripStatusLabel1,
-        	        	        	this.toolStripStatusLabel2,
+        	        	        	this.tracksTextToolStripStatusLabel,
+        	        	        	this.tracksToolStripStatusLabel,
         	        	        	this.toolStripStatusLabel3,
-        	        	        	this.toolStripStatusLabel4,
-        	        	        	this.toolStripStatusLabel5});
+        	        	        	this.tipTextToolStripStatusLabel,
+        	        	        	this.tipToolStripStatusLabel});
         	this.statusStrip1.Location = new System.Drawing.Point(0, 246);
         	this.statusStrip1.Name = "statusStrip1";
         	this.statusStrip1.Size = new System.Drawing.Size(384, 20);
         	this.statusStrip1.TabIndex = 10;
         	this.statusStrip1.Text = "statusStrip1";
         	// 
-        	// toolStripStatusLabel1
+        	// tracksTextToolStripStatusLabel
         	// 
-        	this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-        	this.toolStripStatusLabel1.Size = new System.Drawing.Size(44, 15);
-        	this.toolStripStatusLabel1.Text = "Tracks:";
+        	this.tracksTextToolStripStatusLabel.Name = "tracksTextToolStripStatusLabel";
+        	this.tracksTextToolStripStatusLabel.Size = new System.Drawing.Size(44, 15);
+        	this.tracksTextToolStripStatusLabel.Text = "Tracks:";
         	// 
-        	// toolStripStatusLabel2
+        	// tracksToolStripStatusLabel
         	// 
-        	this.toolStripStatusLabel2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-        	this.toolStripStatusLabel2.Size = new System.Drawing.Size(14, 15);
-        	this.toolStripStatusLabel2.Text = "0";
+        	this.tracksToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+        	this.tracksToolStripStatusLabel.Name = "tracksToolStripStatusLabel";
+        	this.tracksToolStripStatusLabel.Size = new System.Drawing.Size(14, 15);
+        	this.tracksToolStripStatusLabel.Text = "0";
         	// 
         	// toolStripStatusLabel3
         	// 
@@ -642,18 +664,18 @@ namespace TIMP
         	this.toolStripStatusLabel3.Size = new System.Drawing.Size(12, 15);
         	this.toolStripStatusLabel3.Text = "/";
         	// 
-        	// toolStripStatusLabel4
+        	// tipTextToolStripStatusLabel
         	// 
-        	this.toolStripStatusLabel4.Name = "toolStripStatusLabel4";
-        	this.toolStripStatusLabel4.Size = new System.Drawing.Size(27, 15);
-        	this.toolStripStatusLabel4.Text = "Tip:";
+        	this.tipTextToolStripStatusLabel.Name = "tipTextToolStripStatusLabel";
+        	this.tipTextToolStripStatusLabel.Size = new System.Drawing.Size(27, 15);
+        	this.tipTextToolStripStatusLabel.Text = "Tip:";
         	// 
-        	// toolStripStatusLabel5
+        	// tipToolStripStatusLabel
         	// 
-        	this.toolStripStatusLabel5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.toolStripStatusLabel5.Name = "toolStripStatusLabel5";
-        	this.toolStripStatusLabel5.Size = new System.Drawing.Size(41, 15);
-        	this.toolStripStatusLabel5.Text = "v0.5.0";
+        	this.tipToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+        	this.tipToolStripStatusLabel.Name = "tipToolStripStatusLabel";
+        	this.tipToolStripStatusLabel.Size = new System.Drawing.Size(12, 15);
+        	this.tipToolStripStatusLabel.Text = "-";
         	// 
         	// TimpForm
         	// 
@@ -679,11 +701,11 @@ namespace TIMP
         	this.statusStrip1.PerformLayout();
         	this.ResumeLayout(false);
         }
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel5;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel4;
+        private System.Windows.Forms.ToolStripStatusLabel tipToolStripStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel tipTextToolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel tracksToolStripStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel tracksTextToolStripStatusLabel;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem sourceCodeGithubcomToolStripMenuItem;

@@ -152,7 +152,7 @@ namespace TIMP
                     else
                     {
                         // Check for an integer/index
-                        if (int.TryParse(timpArguments[1], out int index))
+                        /*#if (int.TryParse(timpArguments[1], out int index))
                         {
                             // Adjust for human / 1-based
                             index--;
@@ -164,7 +164,7 @@ namespace TIMP
                         {
                             // Play command
                             this.ProcessPlayCommand(timpArguments);
-                        }
+                        }#*/
                     }
 
                     break;
@@ -650,9 +650,6 @@ namespace TIMP
         /// <param name="index">Index.</param>
         private void PlayByIndex(int index)
         {
-            //#
-            this.Text = $"{index} / {this.playerListView.Items.Count}";
-
             // Check the index is valid
             if (index > -1 && index < this.playerListView.Items.Count)
             {
@@ -668,7 +665,7 @@ namespace TIMP
                         this.playerListView.Items[index].Focused = false;
                     }
 
-                    //#
+                    // Focus the item
                     this.playerListView.Focus();
 
                     // Focus the item
@@ -676,6 +673,10 @@ namespace TIMP
 
                     // Select the item
                     this.playerListView.Items[index].Selected = true;
+
+                    // Play selected item
+                    this.NAudioPlayNew(Path.Combine(this.playerListView.Items[index].Tag.ToString()));
+
                 }
                 catch (Exception ex)
                 {
@@ -1004,7 +1005,7 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerListViewSelectedIndexChanged(object sender, EventArgs e)
         {
-            // Skip if nothing is selected
+            /*// Skip if nothing is selected
             if (this.playerListView.SelectedItems.Count == 0)
             {
                 // Halt flow
@@ -1019,7 +1020,7 @@ namespace TIMP
             catch (Exception ex)
             {
                 // TODO Log
-            }
+            }*/
         }
 
         /// <summary>
@@ -1050,6 +1051,33 @@ namespace TIMP
         private void OnAboutToolStripMenuItemClick(object sender, EventArgs e)
         {
 
+        }
+
+        private void OnPlayerListViewMouseClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void OnPlayerListViewMouseDown(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void OnPlayTimeTrackBarValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnButtonMouseEnter(object sender, EventArgs e)
+        {
+            // Set name
+            this.tipToolStripStatusLabel.Text = ((Button)sender).Name.Replace("Button", string.Empty).Replace("CheckBox", string.Empty).ToUpper();
+        }
+
+        private void OnButtonMouseLeave(object sender, EventArgs e)
+        {
+            // Clear string
+            this.tipToolStripStatusLabel.Text = string.Empty;
         }
     }
 }
