@@ -176,13 +176,19 @@ namespace TIMP
 
                     break;
 
-                // Shuffle
+                // TODO Shuffle [Can be simplified by shuffling the items themselves]
                 case "/shuffle":
                     // Begin the update
                     this.playerListView.BeginUpdate();
 
+                    // Declare files list
+                    var filesList = new List<string>();
+
                     // Get items into list
-                    var filesList = this.playerListView.Items.Cast<String>().ToList();
+                    foreach (ListViewItem item in this.playerListView.Items)
+                    {
+                        filesList.Add(item.Tag.ToString());
+                    }
 
                     // Clear previous items
                     this.playerListView.Items.Clear();
@@ -191,7 +197,11 @@ namespace TIMP
                     filesList.Shuffle();
 
                     // Add files to list box
-                    /*#this.playerListView.Items.AddRange(filesList.ToArray());#*/
+                    foreach (var item in filesList)
+                    {
+                        // Add to the list view
+                        this.AddItem(item);
+                    }
 
                     // End the update
                     this.playerListView.EndUpdate();
@@ -537,19 +547,24 @@ namespace TIMP
 
                 for (int i = 0; i < filesList.Count; i++)
                 {
-                    // Set the item
-                    var item = new ListViewItem(new[] { Path.GetFileNameWithoutExtension(filesList[i]), string.Empty, string.Empty })
-                    {
-                        // Set the tag
-                        Tag = filesList[i]
-                    };
-
-                    // Add to listview
-                    this.playerListView.Items.Add(item);
+                    this.AddItem(filesList[i]);
                 }
 
                 // Process file tags to populate listview
             }
+        }
+
+        private void AddItem(string itemPath)
+        {
+            // Set the item
+            var item = new ListViewItem(new[] { Path.GetFileNameWithoutExtension(itemPath), string.Empty, string.Empty })
+            {
+                // Set the tag
+                Tag = itemPath
+            };
+
+            // Add to listview
+            this.playerListView.Items.Add(item);
         }
 
         void OnPlayerListBoxClick(object sender, EventArgs e)
@@ -635,18 +650,39 @@ namespace TIMP
         /// <param name="index">Index.</param>
         private void PlayByIndex(int index)
         {
+            //#
+            this.Text = $"{index} / {this.playerListView.Items.Count}";
+
             // Check the index is valid
             if (index > -1 && index < this.playerListView.Items.Count)
             {
-                // Check if it's the same index
-                if (this.playerListView.SelectedIndices[0] == index)
+                try
                 {
-                    // Deselect
-                    this.playerListView.Items[index].Selected = false;
-                }
+                    // Check if it's the same index
+                    if (this.playerListView.SelectedIndices[0] == index)
+                    {
+                        // Deselect
+                        this.playerListView.Items[index].Selected = false;
 
-                // Set index as selected
-                this.playerListView.Items[index].Selected = true;
+                        // Remove focus
+                        this.playerListView.Items[index].Focused = false;
+                    }
+
+                    //#
+                    this.playerListView.Focus();
+
+                    // Focus the item
+                    this.playerListView.Items[index].Focused = true;
+
+                    // Select the item
+                    this.playerListView.Items[index].Selected = true;
+                }
+                catch (Exception ex)
+                {
+                    // TODO Log
+                    //#
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
