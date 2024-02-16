@@ -152,7 +152,7 @@ namespace TIMP
                     else
                     {
                         // Check for an integer/index
-                        /*#if (int.TryParse(timpArguments[1], out int index))
+                        if (int.TryParse(timpArguments[1], out int index))
                         {
                             // Adjust for human / 1-based
                             index--;
@@ -164,7 +164,7 @@ namespace TIMP
                         {
                             // Play command
                             this.ProcessPlayCommand(timpArguments);
-                        }#*/
+                        }
                     }
 
                     break;
@@ -554,6 +554,10 @@ namespace TIMP
             }
         }
 
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="itemPath">Item path.</param>
         private void AddItem(string itemPath)
         {
             // Set the item
@@ -681,8 +685,6 @@ namespace TIMP
                 catch (Exception ex)
                 {
                     // TODO Log
-                    //#
-                    MessageBox.Show(ex.Message);
                 }
             }
         }
@@ -1058,9 +1060,26 @@ namespace TIMP
 
         }
 
+        /// <summary>
+        /// Handles the player list view mouse down.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
         private void OnPlayerListViewMouseDown(object sender, MouseEventArgs e)
         {
+            // Check for left click
+            if (e.Button == MouseButtons.Left)
+            {
+                // Set hit test info
+                ListViewHitTestInfo listViewHitTestInfo = this.playerListView.HitTest(e.Location);
 
+                // Check for an item
+                if (listViewHitTestInfo.Item != null)
+                {
+                    // Play it
+                    this.PlayByIndex(listViewHitTestInfo.Item.Index);
+                }
+            }
         }
 
         private void OnPlayTimeTrackBarValueChanged(object sender, EventArgs e)
@@ -1071,7 +1090,7 @@ namespace TIMP
         private void OnButtonMouseEnter(object sender, EventArgs e)
         {
             // Set name
-            this.tipToolStripStatusLabel.Text = ((Button)sender).Name.Replace("Button", string.Empty).Replace("CheckBox", string.Empty).ToUpper();
+            this.tipToolStripStatusLabel.Text = ((Control)sender).Name.Replace("Button", string.Empty).Replace("CheckBox", string.Empty).ToUpper();
         }
 
         private void OnButtonMouseLeave(object sender, EventArgs e)
