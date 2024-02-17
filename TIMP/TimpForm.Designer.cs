@@ -542,7 +542,7 @@ namespace TIMP
         	this.loopModeCheckBox.TabIndex = 6;
         	this.loopModeCheckBox.ThreeState = true;
         	this.loopModeCheckBox.UseVisualStyleBackColor = true;
-        	this.loopModeCheckBox.CheckedChanged += new System.EventHandler(this.OnLoopModeCheckBoxCheckedChanged);
+        	this.loopModeCheckBox.CheckStateChanged += new System.EventHandler(this.OnLoopModeCheckBoxCheckStateChanged);
         	this.loopModeCheckBox.MouseEnter += new System.EventHandler(this.OnButtonMouseEnter);
         	this.loopModeCheckBox.MouseLeave += new System.EventHandler(this.OnButtonMouseLeave);
         	// 

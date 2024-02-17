@@ -168,7 +168,7 @@ namespace TIMP
                     else
                     {
                         // Check for an integer/index
-                        if (int.TryParse(timpArguments[1], out int index))
+                        /*#if (int.TryParse(timpArguments[1], out int index))
                         {
                             // Adjust for human / 1-based
                             index--;
@@ -180,7 +180,7 @@ namespace TIMP
                         {
                             // Play command
                             this.ProcessPlayCommand(timpArguments);
-                        }
+                        }#*/
                     }
 
                     break;
@@ -970,16 +970,6 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Handles the loop mode check box checked changed.
-        /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void OnLoopModeCheckBoxCheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        /// <summary>
         /// Handles the exit button click.
         /// </summary>
         /// <param name="sender">Sender object.</param>
@@ -1083,6 +1073,50 @@ namespace TIMP
             {
                 // Trigger play
                 this.PlayByIndex(e.RowIndex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the loop mode check box check state changed.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnLoopModeCheckBoxCheckStateChanged(object sender, EventArgs e)
+        {
+            // Act on current check state
+            switch (this.loopModeCheckBox.CheckState)
+            {
+                // Loop list
+                case CheckState.Checked:
+                    // Check if must click
+                    if (this.looplistToolStripMenuItem.Checked == false)
+                    {
+                        // Click to check it
+                        this.looplistToolStripMenuItem.PerformClick();
+                    }
+
+                    break;
+
+                // Loop one
+                case CheckState.Indeterminate:
+                    // Check if must click
+                    if (this.looponeToolStripMenuItem.Checked == false)
+                    {
+                        // Click to check it
+                        this.looponeToolStripMenuItem.PerformClick();
+                    }
+
+                    break;
+
+                // No loop
+                case CheckState.Unchecked:
+                    // Check if must click
+                    if (this.noLoopToolStripMenuItem.Checked == false)
+                    {
+                        // Click to check it
+                        this.noLoopToolStripMenuItem.PerformClick();
+                    }
+                    break;
             }
         }
     }
