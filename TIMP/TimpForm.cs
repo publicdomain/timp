@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
+using System.Data;
 
 namespace TIMP
 {
@@ -50,14 +51,9 @@ namespace TIMP
         private string directoryPath;
 
         /// <summary>
-        /// The track list.
+        /// The player data table.
         /// </summary>
-        private List<ListViewItem> trackList = new List<ListViewItem>();
-
-        /// <summary>
-        /// The index of the track.
-        /// </summary>
-        private int trackIndex = -1;
+        DataTable playerDataTable = new DataTable();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
@@ -84,6 +80,16 @@ namespace TIMP
 
             // Set cancel button
             this.CancelButton = closeButton;
+
+            /* Declare the data table columns */
+
+            // Add columns to the plaer's data table
+            this.playerDataTable.Columns.Add("Title", typeof(string));
+            this.playerDataTable.Columns.Add("Duration", typeof(TimeSpan));
+            this.playerDataTable.Columns.Add("Artist", typeof(string));
+            this.playerDataTable.Columns.Add("Album", typeof(string));
+            this.playerDataTable.Columns.Add("Year", typeof(string));
+            this.playerDataTable.Columns.Add("Path", typeof(string));
         }
 
         /// <summary>
@@ -179,6 +185,18 @@ namespace TIMP
 
                     break;
 
+                // Autoplay
+                case "/autoplay":
+                    this.autoplayToolStripMenuItem.Checked = true;
+
+                    break;
+
+                // No autoplay
+                case "/noautoplay":
+                    this.autoplayToolStripMenuItem.Checked = false;
+
+                    break;
+
                 // Play/Pause
                 case "/playpause":
                     // Trigger with pause
@@ -186,43 +204,17 @@ namespace TIMP
 
                     break;
 
-                // TODO Shuffle [Can be simplified by shuffling the items themselves]
+                // Shuffle
                 case "/shuffle":
-                    // Begin the update
-                    this.playerListView.BeginUpdate();
-
-                    // Declare files list
-                    var filesList = new List<string>();
-
-                    // Get items into list
-                    foreach (ListViewItem item in this.playerListView.Items)
-                    {
-                        filesList.Add(item.Tag.ToString());
-                    }
-
-                    // Clear previous items
-                    this.playerListView.Items.Clear();
-
-                    // Shuffle files list
-                    filesList.Shuffle();
-
-                    // Add files to list box
-                    foreach (var item in filesList)
-                    {
-                        // Add to the list view
-                        this.AddItem(item);
-                    }
-
-                    // End the update
-                    this.playerListView.EndUpdate();
+                    // Shuffle the items
+                    this.ShuffleItems();
 
                     break;
 
                 // Sort
                 case "/sort":
-                    // Sort and back
-                    /*#this.playerListView.Sorted = true;
-                    this.playerListView.Sorted = false;#*/
+                    // Sort the items
+                    this.SortItems();
 
                     break;
 
@@ -288,7 +280,7 @@ namespace TIMP
         private void PlayFirst()
         {
             // Check there is at least one loaded track
-            if (this.playerListView.Items.Count > 0)
+            if (this.playerDataTable.Rows.Count > 0)
             {
                 // Play first track
                 this.PlayByIndex(0);
@@ -301,10 +293,10 @@ namespace TIMP
         private void PlayLast()
         {
             // Check there is at least one loaded track
-            if (this.playerListView.Items.Count > 0)
+            if (this.playerDataTable.Rows.Count > 0)
             {
                 // Play last track
-                this.PlayByIndex(this.playerListView.Items.Count - 1);
+                this.PlayByIndex(this.playerDataTable.Rows.Count - 1);
             }
         }
 
@@ -338,10 +330,10 @@ namespace TIMP
                 // Stopped
                 case PlaybackState.Stopped:
                     // Check there's a track selected
-                    if (this.playerListView.SelectedIndices.Count > 0)
+                    if (this.playerDataGridView.SelectedRows.Count > 0)
                     {
                         // Play current selection
-                        this.PlayByIndex(this.playerListView.SelectedIndices[0]);
+                        this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index);
                     }
 
                     break;
@@ -372,6 +364,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnTimpFormLoad(object sender, EventArgs e)
         {
+            // Bind the data table
+            this.playerDataGridView.DataSource = this.playerDataTable;
+
             // Relocate and hide the form
             this.RelocateAndHide();
 
@@ -499,9 +494,13 @@ namespace TIMP
             // Show folder browser dialog
             if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
             {
+                //#
+                MessageBox.Show("A");
                 // Process selected directory
                 this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
 
+                //#
+                MessageBox.Show("B");
                 // Play the first track
                 this.PlayFirst();
             }
@@ -540,57 +539,27 @@ namespace TIMP
                 // Set files list
                 List<string> filesList = files.Select(f => f.FullName).ToList();
 
-                // Clear previous items
-                this.playerListView.Items.Clear();
+                // Clear data table
+                this.playerDataTable.Clear();
 
-                // Reset current player
-                //this.NAudioReset();
+                /* Add files to list box */
+
+                // Iterate files sequentially
+                for (int i = 0; i < filesList.Count; i++)
+                {
+                    // Add row
+                    this.playerDataTable.Rows.Add(Path.GetFileNameWithoutExtension(filesList[i]), new TimeSpan(), string.Empty, string.Empty, string.Empty, filesList[i]);
+                }
 
                 // Check if must shuffle
                 if (this.shuffledToolStripMenuItem.Checked)
                 {
                     // Shuffle files list
-                    filesList.Shuffle();
+                    this.ShuffleItems();
                 }
 
-                /* Add files to list box */
-
-                for (int i = 0; i < filesList.Count; i++)
-                {
-                    this.AddItem(filesList[i]);
-                }
-
-                // Process file tags to populate listview
+                // TODO Process file tags to populate listview
             }
-        }
-
-        /// <summary>
-        /// Clears the items.
-        /// </summary>
-        private void ClearItems()
-        {
-            // Clear track list
-            this.trackList.Clear();
-
-            // Add to listview
-            this.playerListView.Items.Clear();
-        }
-
-        /// <summary>
-        /// Adds the item.
-        /// </summary>
-        /// <param name="itemPath">Item path.</param>
-        private void AddItem(string itemPath)
-        {
-            // Set the item
-            var item = new ListViewItem(new[] { Path.GetFileNameWithoutExtension(itemPath), string.Empty, string.Empty })
-            {
-                // Set the tag
-                Tag = itemPath
-            };
-
-            // Add to listview
-            this.playerListView.Items.Add(item);
         }
 
         /// <summary>
@@ -614,27 +583,32 @@ namespace TIMP
         /// </summary>
         private void PlayPrev()
         {
-            // If nothing is selected, exit function
-            if (this.playerListView.SelectedIndices.Count == 0)
+            // If check for a valid track index
+            if (this.playerDataGridView.SelectedRows.Count == 0)
             {
                 // Halt flow
                 return;
             }
 
             // Check for the first one
-            if (this.playerListView.SelectedIndices[0] == 0)
+            if (this.playerDataGridView.SelectedRows[0].Index == 0)
             {
                 // Check if must loop
                 if (this.looplistToolStripMenuItem.Checked)
                 {
                     // Loop play / Play and select last one
-                    this.PlayByIndex(this.playerListView.Items.Count - 1);
+                    this.PlayByIndex(this.playerDataTable.Rows.Count - 1);
+                }
+                else
+                {
+                    // Repeat first track / zero index
+                    this.PlayByIndex(0);
                 }
             }
             else
             {
                 // Play the previous one
-                this.PlayByIndex(this.playerListView.SelectedIndices[0] - 1);
+                this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index - 1);
             }
         }
 
@@ -643,36 +617,32 @@ namespace TIMP
         /// </summary>
         private void PlayNext()
         {
-            // If nothing is selected, exit function
-            if (this.playerListView.SelectedIndices.Count == 0)
+            // If check for a valid track index
+            if (this.playerDataGridView.SelectedRows.Count == 0)
             {
                 // Halt flow
                 return;
             }
 
-            // Check for auto-play
-            if (this.autoplayToolStripMenuItem.Checked)
+            // Check if must play the same song
+            if (this.looponeToolStripMenuItem.Checked)
             {
-                // Check if must play the same song
-                if (this.looponeToolStripMenuItem.Checked)
+                // Loop the same song
+                this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index);
+            } // Check for the last one
+            else if (this.playerDataGridView.SelectedRows[0].Index == this.playerDataTable.Rows.Count - 1)
+            {
+                // Check if must loop the list 
+                if (this.looplistToolStripMenuItem.Checked)
                 {
-                    // Loop the same song
-                    this.PlayByIndex(this.playerListView.SelectedIndices[0]);
-                } // Check for the last one
-                else if (this.playerListView.SelectedIndices[0] == this.playerListView.Items.Count - 1)
-                {
-                    // Check if must loop the list 
-                    if (this.looplistToolStripMenuItem.Checked)
-                    {
-                        // Loop list / Play the first one
-                        this.PlayByIndex(0);
-                    } // Else, no list loop == no further play
-                } // No loop
-                else
-                {
-                    // Play the next one if not at the en d of the list
-                    this.PlayByIndex(this.playerListView.SelectedIndices[0] + 1);
-                }
+                    // Loop list / Play the first one
+                    this.PlayByIndex(0);
+                } // Else, no list loop == no further play
+            } // No loop
+            else
+            {
+                // Play the next one if not at the end of the list
+                this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index + 1);
             }
         }
 
@@ -683,32 +653,19 @@ namespace TIMP
         private void PlayByIndex(int index)
         {
             // Check the index is valid
-            if (index > -1 && index < this.playerListView.Items.Count)
+            if (index > -1 && index < this.playerDataTable.Rows.Count)
             {
                 try
                 {
                     // Check if it's the same index
-                    if (this.playerListView.SelectedIndices[0] == index)
+                    if (this.playerDataGridView.SelectedRows[0].Index == index)
                     {
                         // Deselect
-                        this.playerListView.Items[index].Selected = false;
-
-                        // Remove focus
-                        this.playerListView.Items[index].Focused = false;
+                        this.playerDataGridView.ClearSelection();
                     }
 
-                    // Focus the item
-                    this.playerListView.Focus();
-
-                    // Focus the item
-                    this.playerListView.Items[index].Focused = true;
-
-                    // Select the item
-                    this.playerListView.Items[index].Selected = true;
-
-                    // Play selected item
-                    this.NAudioPlayNew(Path.Combine(this.playerListView.Items[index].Tag.ToString()));
-
+                    // Select the track to trigger play
+                    this.playerDataGridView.Rows[index].Selected = true;
                 }
                 catch (Exception ex)
                 {
@@ -826,15 +783,19 @@ namespace TIMP
             }
 
             // TODO If nothing is selected, exit the function [May be improved, e.g. using the check above]
-            if (this.playerListView.SelectedItems.Count == 0)
+            if (this.playerDataGridView.SelectedRows.Count == 0)
             {
                 // Halt flow
                 return;
             }
             else
             {
-                // Play the next one
-                this.PlayNext();
+                // Check for auto-play
+                if (this.autoplayToolStripMenuItem.Checked)
+                {
+                    // Play the next one
+                    this.PlayNext();
+                }
             }
         }
 
@@ -1029,31 +990,6 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Handles the player list view selected index changed.
-        /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void OnPlayerListViewSelectedIndexChanged(object sender, EventArgs e)
-        {
-            /*// Skip if nothing is selected
-            if (this.playerListView.SelectedItems.Count == 0)
-            {
-                // Halt flow
-                return;
-            }
-
-            try
-            {
-                // Play selected item
-                this.NAudioPlayNew(Path.Combine(this.playerListView.SelectedItems[0].Tag.ToString()));
-            }
-            catch (Exception ex)
-            {
-                // TODO Log
-            }*/
-        }
-
-        /// <summary>
         /// Handles the original thread donation codercom tool strip menu item click.
         /// </summary>
         /// <param name="sender">Sender object.</param>
@@ -1088,28 +1024,6 @@ namespace TIMP
 
         }
 
-        /// <summary>
-        /// Handles the player list view mouse down.
-        /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
-        private void OnPlayerListViewMouseDown(object sender, MouseEventArgs e)
-        {
-            // Check for left click
-            if (e.Button == MouseButtons.Left)
-            {
-                // Set hit test info
-                ListViewHitTestInfo listViewHitTestInfo = this.playerListView.HitTest(e.Location);
-
-                // Check for an item
-                if (listViewHitTestInfo.Item != null)
-                {
-                    // Play it
-                    this.PlayByIndex(listViewHitTestInfo.Item.Index);
-                }
-            }
-        }
-
         private void OnPlayTimeTrackBarValueChanged(object sender, EventArgs e)
         {
 
@@ -1125,6 +1039,31 @@ namespace TIMP
         {
             // Clear string
             this.tipToolStripStatusLabel.Text = string.Empty;
+        }
+
+        /// <summary>
+        /// Ons the player data grid view selection changed.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        private void OnPlayerDataGridViewSelectionChanged(object sender, EventArgs e)
+        {
+            // Skip if nothing is selected
+            if (this.playerDataGridView.SelectedRows.Count == 0)
+            {
+                // Halt flow
+                return;
+            }
+
+            try
+            {
+                // Play selected item
+                this.NAudioPlayNew(this.playerDataGridView.SelectedRows[0].Cells["Path"].Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                // TODO Log
+            }
         }
     }
 }
