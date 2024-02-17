@@ -379,6 +379,11 @@ namespace TIMP
                 // Process play command, skipping the first element / passed exe
                 this.ProcessPlayCommand(args.Skip(1).ToArray());
             }
+
+            /* Settings data */
+
+            //# Loop mode
+            this.looplistToolStripMenuItem.PerformClick();
         }
 
         /// <summary>
@@ -426,8 +431,14 @@ namespace TIMP
             Rectangle workingArea = Screen.GetWorkingArea(this);
             this.Location = new Point(workingArea.Right - Size.Width, workingArea.Bottom - Size.Height);
 
+            // Make topmost
+            this.TopMost = true;
+
             // Show the form
             this.Show();
+
+            // Reset topmost
+            this.TopMost = false;
         }
 
         /// <summary>
