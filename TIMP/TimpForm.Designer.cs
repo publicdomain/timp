@@ -70,12 +70,6 @@ namespace TIMP
         	this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.playerDataGridView = new System.Windows.Forms.DataGridView();
-        	this.miniToolStrip = new System.Windows.Forms.StatusStrip();
-        	this.tracksTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.tracksToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.tipTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-        	this.tipToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
         	this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
         	this.hideButton = new System.Windows.Forms.Button();
         	this.firstButton = new System.Windows.Forms.Button();
@@ -92,6 +86,12 @@ namespace TIMP
         	this.playTimeTrackBar = new System.Windows.Forms.TrackBar();
         	this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
         	this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+        	this.tracksTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tracksToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.separatorSlashToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tipTextToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+        	this.tipToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
         	this.notifyIconContextMenuStrip.SuspendLayout();
         	((System.ComponentModel.ISupportInitialize)(this.playerDataGridView)).BeginInit();
         	this.tableLayoutPanel3.SuspendLayout();
@@ -370,58 +370,21 @@ namespace TIMP
         	// 
         	this.playerDataGridView.AllowUserToAddRows = false;
         	this.playerDataGridView.AllowUserToDeleteRows = false;
+        	this.playerDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
         	this.playerDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         	this.playerDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
         	this.playerDataGridView.Location = new System.Drawing.Point(3, 3);
         	this.playerDataGridView.MultiSelect = false;
         	this.playerDataGridView.Name = "playerDataGridView";
         	this.playerDataGridView.ReadOnly = true;
+        	this.playerDataGridView.RowHeadersVisible = false;
         	this.playerDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
         	this.playerDataGridView.Size = new System.Drawing.Size(378, 155);
         	this.playerDataGridView.StandardTab = true;
         	this.playerDataGridView.TabIndex = 11;
+        	this.playerDataGridView.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnPlayerDataGridViewCellMouseClick);
+        	this.playerDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnPlayerDataGridViewDataBindingComplete);
         	this.playerDataGridView.SelectionChanged += new System.EventHandler(this.OnPlayerDataGridViewSelectionChanged);
-        	// 
-        	// miniToolStrip
-        	// 
-        	this.miniToolStrip.AutoSize = false;
-        	this.miniToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-        	this.miniToolStrip.Location = new System.Drawing.Point(0, 0);
-        	this.miniToolStrip.Name = "miniToolStrip";
-        	this.miniToolStrip.Size = new System.Drawing.Size(384, 20);
-        	this.miniToolStrip.TabIndex = 10;
-        	// 
-        	// tracksTextToolStripStatusLabel
-        	// 
-        	this.tracksTextToolStripStatusLabel.Name = "tracksTextToolStripStatusLabel";
-        	this.tracksTextToolStripStatusLabel.Size = new System.Drawing.Size(44, 15);
-        	this.tracksTextToolStripStatusLabel.Text = "Tracks:";
-        	// 
-        	// tracksToolStripStatusLabel
-        	// 
-        	this.tracksToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.tracksToolStripStatusLabel.Name = "tracksToolStripStatusLabel";
-        	this.tracksToolStripStatusLabel.Size = new System.Drawing.Size(14, 15);
-        	this.tracksToolStripStatusLabel.Text = "0";
-        	// 
-        	// toolStripStatusLabel3
-        	// 
-        	this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
-        	this.toolStripStatusLabel3.Size = new System.Drawing.Size(12, 15);
-        	this.toolStripStatusLabel3.Text = "/";
-        	// 
-        	// tipTextToolStripStatusLabel
-        	// 
-        	this.tipTextToolStripStatusLabel.Name = "tipTextToolStripStatusLabel";
-        	this.tipTextToolStripStatusLabel.Size = new System.Drawing.Size(27, 15);
-        	this.tipTextToolStripStatusLabel.Text = "Tip:";
-        	// 
-        	// tipToolStripStatusLabel
-        	// 
-        	this.tipToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.tipToolStripStatusLabel.Name = "tipToolStripStatusLabel";
-        	this.tipToolStripStatusLabel.Size = new System.Drawing.Size(12, 15);
-        	this.tipToolStripStatusLabel.Text = "-";
         	// 
         	// tableLayoutPanel3
         	// 
@@ -655,21 +618,60 @@ namespace TIMP
         	this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
         	        	        	this.tracksTextToolStripStatusLabel,
         	        	        	this.tracksToolStripStatusLabel,
-        	        	        	this.toolStripStatusLabel3,
+        	        	        	this.separatorSlashToolStripStatusLabel,
         	        	        	this.tipTextToolStripStatusLabel,
+        	        	        	this.toolStripStatusLabel1,
         	        	        	this.tipToolStripStatusLabel});
-        	this.statusStrip1.Location = new System.Drawing.Point(0, 246);
+        	this.statusStrip1.Location = new System.Drawing.Point(0, 244);
         	this.statusStrip1.Name = "statusStrip1";
-        	this.statusStrip1.Size = new System.Drawing.Size(384, 20);
-        	this.statusStrip1.TabIndex = 10;
+        	this.statusStrip1.Size = new System.Drawing.Size(384, 22);
+        	this.statusStrip1.TabIndex = 2;
         	this.statusStrip1.Text = "statusStrip1";
+        	// 
+        	// tracksTextToolStripStatusLabel
+        	// 
+        	this.tracksTextToolStripStatusLabel.Name = "tracksTextToolStripStatusLabel";
+        	this.tracksTextToolStripStatusLabel.Size = new System.Drawing.Size(44, 17);
+        	this.tracksTextToolStripStatusLabel.Text = "Tracks:";
+        	// 
+        	// tracksToolStripStatusLabel
+        	// 
+        	this.tracksToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+        	this.tracksToolStripStatusLabel.Name = "tracksToolStripStatusLabel";
+        	this.tracksToolStripStatusLabel.Size = new System.Drawing.Size(14, 17);
+        	this.tracksToolStripStatusLabel.Text = "0";
+        	// 
+        	// separatorSlashToolStripStatusLabel
+        	// 
+        	this.separatorSlashToolStripStatusLabel.Name = "separatorSlashToolStripStatusLabel";
+        	this.separatorSlashToolStripStatusLabel.Size = new System.Drawing.Size(12, 17);
+        	this.separatorSlashToolStripStatusLabel.Text = "/";
+        	// 
+        	// tipTextToolStripStatusLabel
+        	// 
+        	this.tipTextToolStripStatusLabel.Name = "tipTextToolStripStatusLabel";
+        	this.tipTextToolStripStatusLabel.Size = new System.Drawing.Size(27, 17);
+        	this.tipTextToolStripStatusLabel.Text = "Tip:";
+        	// 
+        	// toolStripStatusLabel1
+        	// 
+        	this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+        	this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+        	// 
+        	// tipToolStripStatusLabel
+        	// 
+        	this.tipToolStripStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+        	this.tipToolStripStatusLabel.Name = "tipToolStripStatusLabel";
+        	this.tipToolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
         	// 
         	// TimpForm
         	// 
         	this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
         	this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         	this.ClientSize = new System.Drawing.Size(384, 266);
+        	this.Controls.Add(this.statusStrip1);
         	this.Controls.Add(this.tableLayoutPanel1);
+        	this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
         	this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
         	this.Name = "TimpForm";
         	this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
@@ -687,15 +689,16 @@ namespace TIMP
         	this.statusStrip1.ResumeLayout(false);
         	this.statusStrip1.PerformLayout();
         	this.ResumeLayout(false);
+        	this.PerformLayout();
         }
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.DataGridView playerDataGridView;
         private System.Windows.Forms.ToolStripStatusLabel tipToolStripStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel tipTextToolStripStatusLabel;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
+        private System.Windows.Forms.ToolStripStatusLabel separatorSlashToolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel tracksToolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel tracksTextToolStripStatusLabel;
-        private System.Windows.Forms.StatusStrip miniToolStrip;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.DataGridView playerDataGridView;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem sourceCodeGithubcomToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scansubdirectoriesToolStripMenuItem;

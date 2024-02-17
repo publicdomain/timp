@@ -1042,10 +1042,10 @@ namespace TIMP
         }
 
         /// <summary>
-        /// Ons the player data grid view selection changed.
+        /// Handles the player data grid view selection changed.
         /// </summary>
-        /// <param name="sender">Sender.</param>
-        /// <param name="e">E.</param>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnPlayerDataGridViewSelectionChanged(object sender, EventArgs e)
         {
             // Skip if nothing is selected
@@ -1063,6 +1063,26 @@ namespace TIMP
             catch (Exception ex)
             {
                 // TODO Log
+            }
+        }
+
+        private void OnPlayerDataGridViewDataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Handles the player data grid view cell mouse click.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void OnPlayerDataGridViewCellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Check for left click and if item is the same as currently slected
+            if (e.Button == MouseButtons.Left && this.playerDataGridView.SelectedRows[0].Index == e.RowIndex)
+            {
+                // Trigger play
+                this.PlayByIndex(e.RowIndex);
             }
         }
     }
