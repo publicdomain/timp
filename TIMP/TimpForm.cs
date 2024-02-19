@@ -168,7 +168,7 @@ namespace TIMP
                     else
                     {
                         // Check for an integer/index
-                        /*#if (int.TryParse(timpArguments[1], out int index))
+                        if (int.TryParse(timpArguments[1], out int index))
                         {
                             // Adjust for human / 1-based
                             index--;
@@ -180,7 +180,7 @@ namespace TIMP
                         {
                             // Play command
                             this.ProcessPlayCommand(timpArguments);
-                        }#*/
+                        }
                     }
 
                     break;
@@ -570,6 +570,9 @@ namespace TIMP
                 }
 
                 // TODO Process file tags to populate listview
+
+                // Update track count
+                this.tracksToolStripStatusLabel.Text = this.playerDataTable.Rows.Count.ToString();
             }
         }
 
@@ -586,7 +589,43 @@ namespace TIMP
         /// </summary>
         private void ShuffleItems()
         {
+            // The index of the row
+            int index = 0;
 
+            // Iterate shuffled rows
+            foreach (DataRow row in this.playerDataTable.Shuffle().Rows)
+            {
+                // Replace the row
+                this.playerDataTable.Rows[index].ItemArray = row.ItemArray;
+
+                // Raise the index
+                index++;
+            }
+
+            // Reload the track
+            this.ReloadTrack();
+        }
+
+        /// <summary>
+        /// Reloads the track.
+        /// </summary>
+        private void ReloadTrack()
+        {
+            // Check there's smomething selected
+            if (this.playerDataGridView.SelectedRows.Count > 0)
+            {
+                // Check for playing
+                if (this.GetPlaybackState() == PlaybackState.Playing)
+                {
+                    // Play the currently selected track
+                    this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index);
+                }// If paused, stop for further manual ṕlay
+                else if (this.GetPlaybackState() == PlaybackState.Paused)
+                {
+                    // Stop
+                    this.Stop();
+                }//  Else is stopped, hence no action
+            }
         }
 
         /// <summary>
@@ -718,6 +757,15 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Stop this instance.
+        /// </summary>
+        private void Stop()
+        {
+            // Invoke NAudio's stop routine
+            this.NAudioStop();
+        }
+
+        /// <summary>
         /// NAs the udio stop.
         /// </summary>
         private void NAudioStop()
@@ -751,6 +799,24 @@ namespace TIMP
                 this.outputDevice.Pause();
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="T:TIMP.TimpForm"/> is playing.
+        /// </summary>
+        /// <value><c>true</c> if is playing; otherwise, <c>false</c>.</value>
+        private bool IsPlaying => (this.outputDevice.PlaybackState == PlaybackState.Playing);
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="T:TIMP.TimpForm"/> is paused.
+        /// </summary>
+        /// <value><c>true</c> if is paused; otherwise, <c>false</c>.</value>
+        private bool IsPaused => (this.outputDevice.PlaybackState == PlaybackState.Paused);
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="T:TIMP.TimpForm"/> is stopped.
+        /// </summary>
+        /// <value><c>true</c> if is stopped; otherwise, <c>false</c>.</value>
+        private bool IsStopped => (this.outputDevice.PlaybackState == PlaybackState.Stopped);
 
         /// <summary>
         /// NAs the udio reset.

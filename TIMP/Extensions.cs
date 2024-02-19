@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Data;
 
 namespace TIMP
 {
@@ -17,6 +18,33 @@ namespace TIMP
                 values[k] = values[i];
                 values[i] = value;
             }
+        }
+
+        public static DataTable Shuffle(this DataTable table)
+        {
+            int n = table.Rows.Count;
+            List<DataRow> shuffledRows = new List<DataRow>();
+            foreach (DataRow row in table.Rows)
+            {
+                shuffledRows.Add(row);
+            }
+
+            while (n > 1)
+            {
+                n--;
+                int k = rand.Next(n + 1);
+                DataRow value = shuffledRows[k];
+                shuffledRows[k] = shuffledRows[n];
+                shuffledRows[n] = value;
+            }
+
+            DataTable shuffledTable = table.Clone();
+            foreach (DataRow row in shuffledRows)
+            {
+                shuffledTable.ImportRow(row);
+            }
+
+            return shuffledTable;
         }
     }
 }
