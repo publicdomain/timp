@@ -595,7 +595,7 @@ namespace TIMP
             // Iterate shuffled rows
             foreach (DataRow row in this.playerDataTable.Shuffle().Rows)
             {
-                // Replace the row
+                // Replace current row
                 this.playerDataTable.Rows[index].ItemArray = row.ItemArray;
 
                 // Raise the index
