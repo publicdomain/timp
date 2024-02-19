@@ -581,7 +581,36 @@ namespace TIMP
         /// </summary>
         private void SortItems()
         {
+            // Sort by title
+            var dataView = this.playerDataTable.AsDataView();
 
+            dataView.Sort = "Title ASC";
+
+            // The index of the row
+            int rowIndex = 0;
+
+            // The index of the track
+            int trackIndex = this.playerDataGridView.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0 ? this.playerDataGridView.SelectedRows[0].Index : -1;
+
+            // Check if it's playing
+            bool playTrack = this.IsPlaying;
+
+            // Iterate sorted rows
+            foreach (DataRow row in dataView.ToTable().Rows)
+            {
+                // Replace current row
+                this.playerDataTable.Rows[rowIndex].ItemArray = row.ItemArray;
+
+                // Raise the index
+                rowIndex++;
+            }
+
+            // Check if must play track
+            if (trackIndex > -1 && playTrack)
+            {
+                // Play the currently selected track
+                this.PlayByIndex(trackIndex);
+            }
         }
 
         /// <summary>
@@ -590,41 +619,29 @@ namespace TIMP
         private void ShuffleItems()
         {
             // The index of the row
-            int index = 0;
+            int rowIndex = 0;
+
+            // The index of the track
+            int trackIndex = this.playerDataGridView.Rows.GetRowCount(DataGridViewElementStates.Selected) > 0 ? this.playerDataGridView.SelectedRows[0].Index : -1;
+
+            // Check if it's playing
+            bool playTrack = this.IsPlaying;
 
             // Iterate shuffled rows
             foreach (DataRow row in this.playerDataTable.Shuffle().Rows)
             {
                 // Replace current row
-                this.playerDataTable.Rows[index].ItemArray = row.ItemArray;
+                this.playerDataTable.Rows[rowIndex].ItemArray = row.ItemArray;
 
                 // Raise the index
-                index++;
+                rowIndex++;
             }
 
-            // Reload the track
-            this.ReloadTrack();
-        }
-
-        /// <summary>
-        /// Reloads the track.
-        /// </summary>
-        private void ReloadTrack()
-        {
-            // Check there's smomething selected
-            if (this.playerDataGridView.SelectedRows.Count > 0)
+            // Check if must play track
+            if (trackIndex > -1 && playTrack)
             {
-                // Check for playing
-                if (this.GetPlaybackState() == PlaybackState.Playing)
-                {
-                    // Play the currently selected track
-                    this.PlayByIndex(this.playerDataGridView.SelectedRows[0].Index);
-                }// If paused, stop for further manual ṕlay
-                else if (this.GetPlaybackState() == PlaybackState.Paused)
-                {
-                    // Stop
-                    this.Stop();
-                }//  Else is stopped, hence no action
+                // Play the currently selected track
+                this.PlayByIndex(trackIndex);
             }
         }
 
@@ -771,7 +788,7 @@ namespace TIMP
         private void NAudioStop()
         {
             // Check there is an output device
-            if (this.outputDevice != null)
+            if (this.outputDevice != null && !this.IsStopped)
             {
                 // Set the stop flag
                 this.stopFlag = true;
