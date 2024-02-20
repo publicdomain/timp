@@ -1114,7 +1114,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnExitButtonClick(object sender, EventArgs e)
         {
-
+            // Hide tray icon and exit
+            this.ExitTimp();
         }
 
         /// <summary>
@@ -1147,22 +1148,34 @@ namespace TIMP
 
         }
 
-        private void OnPlayerListViewMouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
-
         private void OnPlayTimeTrackBarValueChanged(object sender, EventArgs e)
         {
 
         }
 
+        /// <summary>
+        /// Handles the button mouse enter.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnButtonMouseEnter(object sender, EventArgs e)
         {
-            // Set name
+            // Set tip
             this.tipToolStripStatusLabel.Text = ((Control)sender).Name.Replace("Button", string.Empty).Replace("CheckBox", string.Empty).ToUpper();
+
+            // Append tip info
+            switch (((Control)sender).Name)
+            {
+                default:
+                    break;
+            }
         }
 
+        /// <summary>
+        /// Handles the button mouse leave.
+        /// </summary>
+        /// <param name="sender">Sender object.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnButtonMouseLeave(object sender, EventArgs e)
         {
             // Clear string
