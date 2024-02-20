@@ -1014,7 +1014,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnHideButtonClick(object sender, EventArgs e)
         {
-
+            // Hide form
+            this.Hide();
         }
 
         /// <summary>
