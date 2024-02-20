@@ -1081,7 +1081,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayPauseButtonClick(object sender, EventArgs e)
         {
-
+            // Trigger PlayPause
+            this.PlayPause(false);
         }
 
         /// <summary>
