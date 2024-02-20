@@ -147,7 +147,7 @@ namespace TIMP
 
                 // Stop
                 case "/stop":
-                    this.NAudioStop();
+                    this.Stop();
 
                     break;
 
@@ -370,20 +370,38 @@ namespace TIMP
             // Relocate and hide the form
             this.RelocateAndHide();
 
+            /* Commands */
+
             // Set the arguments
             string[] args = Environment.GetCommandLineArgs();
 
             // Check for passed arguments
             if (args.Length > 1)
             {
-                // Process play command, skipping the first element / passed exe
-                this.ProcessPlayCommand(args.Skip(1).ToArray());
+                // Pre-process start-up commands
+                switch (args[1].ToLowerInvariant())
+                {
+                    // Play
+                    case "/play":
+                        // Process play command, skipping the first element / passed exe
+                        this.ProcessPlayCommand(args.Skip(1).ToArray());
+
+                        break;
+
+                    // Exit
+                    case "/exit":
+                        // Shut down timp
+                        this.ExitTimp();
+
+                        break;
+                }
             }
 
             /* Settings data */
 
             //# Loop mode
-            this.looplistToolStripMenuItem.PerformClick();
+            this.loopModeCheckBox.Checked = true;
+            this.sortShuffleCheckBox.Checked = true;
         }
 
         /// <summary>
@@ -779,29 +797,7 @@ namespace TIMP
         private void Stop()
         {
             // Invoke NAudio's stop routine
-            this.NAudioStop();
-        }
-
-        /// <summary>
-        /// NAs the udio stop.
-        /// </summary>
-        private void NAudioStop()
-        {
-            // Check there is an output device
-            if (this.outputDevice != null && !this.IsStopped)
-            {
-                // Set the stop flag
-                this.stopFlag = true;
-
-                // Stop the device
-                this.outputDevice.Stop();
-
-                // Wait until flag is false
-                while (this.stopFlag == true)
-                {
-                    // Loop
-                }
-            }
+            this.NAudioReset();
         }
 
         /// <summary>
@@ -866,10 +862,10 @@ namespace TIMP
         /// <param name="args">Arguments.</param>
         private void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
-            // Check if must exit immediately
+            // Check for flag
             if (this.stopFlag)
             {
-                // Reset the stop flag
+                // Reset flag
                 this.stopFlag = false;
 
                 // Halt flow
@@ -994,7 +990,68 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnActionsToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            // Set tool strip menu item
+            ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
 
+            // Switch to trigger matching action 
+            switch (toolStripMenuItem.Name)
+            {
+                // Play
+                case "playToolStripMenuItem":
+                    // Perform action
+                    this.PlayPause(true);
+
+                    break;
+
+                // Pause
+                case "pauseToolStripMenuItem":
+                    // Perform action
+                    this.NAudioPause();
+
+                    break;
+
+                // PlayPause
+                case "playpauseToolStripMenuItem":
+                    // Perform action
+                    this.PlayPause(false);
+
+                    break;
+
+                // Stop
+                case "stopToolStripMenuItem":
+                    // Perform action
+                    this.Stop();
+
+                    break;
+
+                // Previous
+                case "previousToolStripMenuItem":
+                    // Perform action
+                    this.PlayPrev();
+
+                    break;
+
+                // Next
+                case "nextToolStripMenuItem":
+                    // Perform action
+                    this.PlayNext();
+
+                    break;
+
+                // Shuffle
+                case "shuffleToolStripMenuItem":
+                    // Perform action
+                    this.ShuffleItems();
+
+                    break;
+
+                // Stop
+                case "sortToolStripMenuItem":
+                    // Perform action
+                    this.SortItems();
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -1166,7 +1223,46 @@ namespace TIMP
             // Append tip info
             switch (((Control)sender).Name)
             {
-                default:
+                // Loop mode check box
+                case "loopModeCheckBox":
+                    // String to append
+                    string append = string.Empty;
+
+                    // Switch on check state
+                    switch (this.loopModeCheckBox.CheckState)
+                    {
+                        // Loop list
+                        case CheckState.Checked:
+                            // Set append
+                            append = ": Loop list";
+
+                            break;
+
+                        // Loop one
+                        case CheckState.Indeterminate:
+                            // Set append
+                            append = ": Loop one";
+
+                            break;
+
+                        // No loop
+                        case CheckState.Unchecked:
+                            // Set append
+                            append = ": No loop";
+
+                            break;
+                    }
+
+                    // Append 
+                    this.tipToolStripStatusLabel.Text += append;
+
+                    break;
+
+                // Sort/shuffle check box
+                case "sortShuffleCheckBox":
+                    // Append 
+                    this.tipToolStripStatusLabel.Text += this.sortShuffleCheckBox.Checked ? ": Shuffled" : ": Sorted";
+
                     break;
             }
         }
