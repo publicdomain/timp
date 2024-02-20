@@ -1058,7 +1058,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnFirstButtonClick(object sender, EventArgs e)
         {
-
+            // Play the first track
+            this.PlayFirst();
         }
 
         /// <summary>
