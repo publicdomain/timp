@@ -1103,7 +1103,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnLastButtonClick(object sender, EventArgs e)
         {
-
+            // Play the last track
+            this.PlayLast();
         }
 
         /// <summary>
