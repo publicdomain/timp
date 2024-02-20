@@ -207,14 +207,14 @@ namespace TIMP
                 // Shuffle
                 case "/shuffle":
                     // Shuffle the items
-                    this.ShuffleItems();
+                    this.ShuffleItems(true);
 
                     break;
 
                 // Sort
                 case "/sort":
                     // Sort the items
-                    this.SortItems();
+                    this.SortItems(true);
 
                     break;
 
@@ -523,13 +523,9 @@ namespace TIMP
             // Show folder browser dialog
             if (this.folderBrowserDialog.ShowDialog() == DialogResult.OK && this.folderBrowserDialog.SelectedPath.Length > 0)
             {
-                //#
-                MessageBox.Show("A");
                 // Process selected directory
                 this.ProcessDirectory(this.folderBrowserDialog.SelectedPath);
 
-                //#
-                MessageBox.Show("B");
                 // Play the first track
                 this.PlayFirst();
             }
@@ -580,11 +576,11 @@ namespace TIMP
                     this.playerDataTable.Rows.Add(Path.GetFileNameWithoutExtension(filesList[i]), new TimeSpan(), string.Empty, string.Empty, string.Empty, filesList[i]);
                 }
 
-                // Check if must shuffle
+                // TODO Check if must shuffle [Can be taken out later to keep a single responsibility]
                 if (this.shuffledToolStripMenuItem.Checked)
                 {
                     // Shuffle files list
-                    this.ShuffleItems();
+                    this.ShuffleItems(false);
                 }
 
                 // TODO Process file tags to populate listview
@@ -597,7 +593,8 @@ namespace TIMP
         /// <summary>
         /// Sorts the items.
         /// </summary>
-        private void SortItems()
+        /// <param name="playAfter">If set to <c>true</c> play after.</param>
+        private void SortItems(bool playAfter)
         {
             // Sort by title
             var dataView = this.playerDataTable.AsDataView();
@@ -623,8 +620,8 @@ namespace TIMP
                 rowIndex++;
             }
 
-            // Check if must play track
-            if (trackIndex > -1 && playTrack)
+            // TODO Check if must play track [playAfter logic was inserted after playTrack so the interplay of both can be improved]
+            if (playAfter && trackIndex > -1 && playTrack)
             {
                 // Play the currently selected track
                 this.PlayByIndex(trackIndex);
@@ -634,7 +631,8 @@ namespace TIMP
         /// <summary>
         /// Shuffles the items.
         /// </summary>
-        private void ShuffleItems()
+        /// <param name="playAfter">If set to <c>true</c> play after.</param>
+        private void ShuffleItems(bool playAfter)
         {
             // The index of the row
             int rowIndex = 0;
@@ -655,8 +653,8 @@ namespace TIMP
                 rowIndex++;
             }
 
-            // Check if must play track
-            if (trackIndex > -1 && playTrack)
+            // TODO Check if must play track [playAfter logic was inserted after playTrack so the interplay of both can be improved]
+            if (playAfter && trackIndex > -1 && playTrack)
             {
                 // Play the currently selected track
                 this.PlayByIndex(trackIndex);
@@ -1041,14 +1039,14 @@ namespace TIMP
                 // Shuffle
                 case "shuffleToolStripMenuItem":
                     // Perform action
-                    this.ShuffleItems();
+                    this.ShuffleItems(true);
 
                     break;
 
                 // Stop
                 case "sortToolStripMenuItem":
                     // Perform action
-                    this.SortItems();
+                    this.SortItems(true);
 
                     break;
             }
@@ -1093,7 +1091,7 @@ namespace TIMP
                 }
 
                 // Shuffle
-                this.ShuffleItems();
+                this.ShuffleItems(true);
             }
             else
             {
@@ -1105,7 +1103,7 @@ namespace TIMP
                 }
 
                 // Sort
-                this.SortItems();
+                this.SortItems(true);
             }
         }
 
