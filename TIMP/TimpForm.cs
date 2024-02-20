@@ -1092,7 +1092,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnNextButtonClick(object sender, EventArgs e)
         {
-
+            // Play the next track
+            this.PlayNext();
         }
 
         /// <summary>
