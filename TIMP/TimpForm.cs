@@ -950,6 +950,20 @@ namespace TIMP
                     this.loopModeCheckBox.CheckState = CheckState.Unchecked;
 
                     break;
+
+                // Sorted
+                case "sortedToolStripMenuItem":
+                    // Set check state
+                    this.sortShuffleCheckBox.Checked = false;
+
+                    break;
+
+                // Shuffled
+                case "shuffledToolStripMenuItem":
+                    // Set check state
+                    this.sortShuffleCheckBox.Checked = true;
+
+                    break;
             }
         }
 
@@ -1010,7 +1024,31 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnSortShuffleCheckBoxCheckedChanged(object sender, EventArgs e)
         {
+            // Act on current check state
+            if (this.sortShuffleCheckBox.Checked)
+            {
+                // Check if must click
+                if (this.shuffledToolStripMenuItem.Checked == false)
+                {
+                    // Click to check it
+                    this.shuffledToolStripMenuItem.PerformClick();
+                }
 
+                // Shuffle
+                this.ShuffleItems();
+            }
+            else
+            {
+                // Check if must click
+                if (this.sortedToolStripMenuItem.Checked == false)
+                {
+                    // Click to check it
+                    this.sortedToolStripMenuItem.PerformClick();
+                }
+
+                // Sort
+                this.SortItems();
+            }
         }
 
         /// <summary>
