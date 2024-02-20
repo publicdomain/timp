@@ -1070,7 +1070,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPreviousButtonClick(object sender, EventArgs e)
         {
-
+            // Play the previous track
+            this.PlayPrev();
         }
 
         /// <summary>
