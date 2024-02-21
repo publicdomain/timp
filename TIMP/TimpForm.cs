@@ -434,17 +434,8 @@ namespace TIMP
         {
             if (e.Button == MouseButtons.Left)
             {
-                // Check if it's not visible
-                if (this.Visible == false)
-                {
-                    // Relocate and show
-                    this.RelocateAndShow();
-                }
-                else
-                {
-                    // Hide the form
-                    this.Hide();
-                }
+                // Relocate and show
+                this.RelocateAndShow();
             }
         }
 
