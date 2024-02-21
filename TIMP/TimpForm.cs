@@ -8,6 +8,7 @@ using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
 using System.Data;
 using Microsoft.Win32;
+using System.Media;
 
 namespace TIMP
 {
@@ -60,6 +61,11 @@ namespace TIMP
         /// The open with timp key list.
         /// </summary>
         private List<string> openWithTimpKeyList = new List<string> { @"Software\Classes\directory\shell\Open with TIMP" };
+
+        /// <summary>
+        /// The sound player.
+        /// </summary>
+        private SoundPlayer soundPlayer = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
@@ -124,11 +130,49 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Plays the passed sound file.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        private void PlaySoundFile(string filePath)
+        {
+            // Dispose of any previous player
+            this.DisposeSoundPlayer();
+
+            // Set instance player afresh
+            this.soundPlayer = new SoundPlayer(filePath);
+
+            // Play the passed file
+            this.soundPlayer.Play();
+        }
+
+        /// <summary>
+        /// Disposes the sound player.
+        /// </summary>
+        private void DisposeSoundPlayer()
+        {
+            // Check for previous player
+            if (this.soundPlayer != null)
+            {
+                // Stop it
+                this.soundPlayer.Stop();
+
+                // Dispose of it
+                this.soundPlayer.Dispose();
+
+                // Reset instance variable
+                this.soundPlayer = null;
+            }
+        }
+
+        /// <summary>
         /// Processes the client message.
         /// </summary>
         /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
+            // Advise by sound
+
+
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
             {
