@@ -365,10 +365,22 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Repeats the track.
+        /// </summary>
+        public void RepeatTrack()
+        {
+            // Stop playing
+            this.Stop();
+
+            // Play selected
+            this.PlayPause(true);
+        }
+
+        /// <summary>
         /// Triggers play or pause
         /// </summary>
         /// <param name="isPlay">If set to <c>true</c> is play.</param>
-        private void PlayPause(bool isPlay)
+        public void PlayPause(bool isPlay)
         {
             // Play action
             switch (this.GetPlaybackState())
@@ -480,6 +492,13 @@ namespace TIMP
             {
                 // Toggle check box by app value presence
                 this.startOnLogonToolStripMenuItem.Checked = registryKey.GetValueNames().Contains("TIMP");
+            }
+
+            // Check if must register the hotkeys
+            if (this.usehotkeysToolStripMenuItem.Checked)
+            {
+                // Register the hotkeys
+                this.timpApplicationContext.RegisterHotkeys();
             }
         }
 
@@ -758,7 +777,7 @@ namespace TIMP
         /// <summary>
         /// Plays the previous.
         /// </summary>
-        private void PlayPrev()
+        public void PlayPrev()
         {
             // If check for a valid track index
             if (this.playerDataGridView.SelectedRows.Count == 0)
@@ -792,7 +811,7 @@ namespace TIMP
         /// <summary>
         /// Plays the next.
         /// </summary>
-        private void PlayNext()
+        public void PlayNext()
         {
             // If check for a valid track index
             if (this.playerDataGridView.SelectedRows.Count == 0)
