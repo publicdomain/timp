@@ -30,12 +30,12 @@ namespace TIMP
         /// <summary>
         /// The close flag.
         /// </summary>
-        bool closeFlag = false;
+        private bool closeFlag = false;
 
         /// <summary>
         /// The stop flag.
         /// </summary>
-        bool stopFlag = false;
+        private bool stopFlag = false;
 
         /// <summary>
         /// The output device.
@@ -71,6 +71,11 @@ namespace TIMP
         /// The advise sound path.
         /// </summary>
         private string adviseSoundPath = "ent_screen02.wav";
+
+        /// <summary>
+        /// The update tip flag.
+        /// </summary>
+        private bool updateTip = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
@@ -1250,6 +1255,13 @@ namespace TIMP
                 // Sort
                 this.SortItems(true);
             }
+
+            // Check if must update the tip
+            if (this.updateTip)
+            {
+                // Trigger button enter
+                this.OnButtonMouseEnter(sender, e);
+            }
         }
 
         /// <summary>
@@ -1281,8 +1293,17 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayPauseButtonClick(object sender, EventArgs e)
         {
+            // TODO Can refactor to stop on right-click
+
             // Trigger PlayPause
             this.PlayPause(false);
+
+            // Check if must update the tip
+            if (this.updateTip)
+            {
+                // Trigger button enter
+                this.OnButtonMouseEnter(sender, e);
+            }
         }
 
         /// <summary>
@@ -1360,16 +1381,27 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnButtonMouseEnter(object sender, EventArgs e)
         {
+            // Set update tip flag
+            this.updateTip = true;
+
             // Set tip
             this.tipToolStripStatusLabel.Text = ((Control)sender).Name.Replace("Button", string.Empty).Replace("CheckBox", string.Empty).ToUpper();
+
+            // String to append
+            string append = string.Empty;
 
             // Append tip info
             switch (((Control)sender).Name)
             {
+                // PlayPause
+                case "playPauseButton":
+                    // Append
+                    append = $": {this.GetPlaybackState().ToString()}";
+
+                    break;
+
                 // Loop mode check box
                 case "loopModeCheckBox":
-                    // String to append
-                    string append = string.Empty;
 
                     // Switch on check state
                     switch (this.loopModeCheckBox.CheckState)
@@ -1396,18 +1428,18 @@ namespace TIMP
                             break;
                     }
 
-                    // Append 
-                    this.tipToolStripStatusLabel.Text += append;
-
                     break;
 
                 // Sort/shuffle check box
                 case "sortShuffleCheckBox":
                     // Append 
-                    this.tipToolStripStatusLabel.Text += this.sortShuffleCheckBox.Checked ? ": Shuffled" : ": Sorted";
+                    append = this.sortShuffleCheckBox.Checked ? ": Shuffled" : ": Sorted";
 
                     break;
             }
+
+            // Append string
+            this.tipToolStripStatusLabel.Text += append;
         }
 
         /// <summary>
@@ -1417,6 +1449,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnButtonMouseLeave(object sender, EventArgs e)
         {
+            // Reset update tip flag
+            this.updateTip = false;
+
             // Clear string
             this.tipToolStripStatusLabel.Text = string.Empty;
         }
@@ -1507,6 +1542,13 @@ namespace TIMP
                         this.noLoopToolStripMenuItem.PerformClick();
                     }
                     break;
+            }
+
+            // Check if must update the tip
+            if (this.updateTip)
+            {
+                // Trigger button enter
+                this.OnButtonMouseEnter(sender, e);
             }
         }
         /// <summary>
