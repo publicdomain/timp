@@ -68,6 +68,11 @@ namespace TIMP
         private SoundPlayer soundPlayer = null;
 
         /// <summary>
+        /// The advise sound path.
+        /// </summary>
+        private string adviseSoundPath = "ent_screen02.wav";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="timpApplicationContext">Timp application context.</param>
@@ -170,8 +175,12 @@ namespace TIMP
         /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
-            // Advise by sound
-
+            // Auditory feedback
+            if (File.Exists(this.adviseSoundPath))
+            {
+                // Play the file
+                this.PlaySoundFile(this.adviseSoundPath);
+            }
 
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
