@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
 using System.Data;
+using Microsoft.Win32;
 
 namespace TIMP
 {
@@ -54,6 +55,11 @@ namespace TIMP
         /// The player data table.
         /// </summary>
         DataTable playerDataTable = new DataTable();
+
+        /// <summary>
+        /// The open with timp key list.
+        /// </summary>
+        private List<string> openWithTimpKeyList = new List<string> { @"Software\Classes\directory\shell\Open with TIMP" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
@@ -388,6 +394,13 @@ namespace TIMP
 
                         break;
 
+                    // Autostart
+                    case "/autostart":
+                        // Hide it
+                        this.Hide();
+
+                        break;
+
                     // Exit
                     case "/exit":
                         // Shut down timp
@@ -402,6 +415,14 @@ namespace TIMP
             //# Loop mode
             this.loopModeCheckBox.Checked = true;
             this.sortShuffleCheckBox.Checked = true;
+            this.addToExplorerToolStripMenuItem.PerformClick();
+
+            // Open registry key
+            using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
+            {
+                // Toggle check box by app value presence
+                this.startOnLogonToolStripMenuItem.Checked = registryKey.GetValueNames().Contains("TIMP");
+            }
         }
 
         /// <summary>
@@ -479,6 +500,13 @@ namespace TIMP
         {
             // Hide the form
             this.Hide();
+
+            // Remove Explorer menu
+            if (this.addToExplorerToolStripMenuItem.Checked)
+            {
+                // Uncheck
+                this.addToExplorerToolStripMenuItem.PerformClick();
+            }
 
             // Set it to the opposite of close flag
             e.Cancel = !closeFlag;
@@ -564,6 +592,9 @@ namespace TIMP
                 // Set files list
                 List<string> filesList = files.Select(f => f.FullName).ToList();
 
+                // Stop any playing
+                this.Stop();
+
                 // Clear data table
                 this.playerDataTable.Clear();
 
@@ -596,6 +627,13 @@ namespace TIMP
         /// <param name="playAfter">If set to <c>true</c> play after.</param>
         private void SortItems(bool playAfter)
         {
+            // Check there's something to work with
+            if (this.playerDataTable.Rows.Count < 2)
+            {
+                // Halt flow
+                return;
+            }
+
             // Sort by title
             var dataView = this.playerDataTable.AsDataView();
 
@@ -634,6 +672,13 @@ namespace TIMP
         /// <param name="playAfter">If set to <c>true</c> play after.</param>
         private void ShuffleItems(bool playAfter)
         {
+            // Check there's something to work with
+            if (this.playerDataTable.Rows.Count < 2)
+            {
+                // Halt flow
+                return;
+            }
+
             // The index of the row
             int rowIndex = 0;
 
@@ -899,6 +944,62 @@ namespace TIMP
 
             // Toggle checked
             toolStripMenuItem.Checked = !toolStripMenuItem.Checked;
+
+            // Check clicked menu item
+            toolStripMenuItem.Checked = true;
+
+            /* Handle post-select operations */
+
+            switch (toolStripMenuItem.Name)
+            {
+                // Add to explorer
+                case "addToExplorerToolStripMenuItem":
+                    // Perform action
+                    if (this.addToExplorerToolStripMenuItem.Checked)
+                    {
+                        // Add to Windows Explorer
+                        this.AddExplorerMenu();
+                    }
+                    else
+                    {
+                        // Remove from Windows Explorer
+                        this.RemoveExplorerMenu();
+                    }
+
+                    break;
+
+                // Start on logon
+                case "startOnLogonToolStripMenuItem":
+                    // Perform action
+                    if (toolStripMenuItem.Name == "startAtLogonToolStripMenuItem")
+                    {
+                        try
+                        {
+                            // Open registry key
+                            using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                            {
+                                // Check if must write to registry
+                                if (this.startOnLogonToolStripMenuItem.Checked)
+                                {
+                                    // Add app value
+                                    registryKey.SetValue("TIMP", $"\"{Application.ExecutablePath}\" /autostart");
+                                }
+                                else
+                                {
+                                    // Erase app value
+                                    registryKey.DeleteValue("TIMP", false);
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // Inform user
+                            MessageBox.Show("Error when interacting with the Windows registry.", "Registry error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+
+                    break;
+            }
         }
 
         /// <summary>
@@ -1362,6 +1463,53 @@ namespace TIMP
                         this.noLoopToolStripMenuItem.PerformClick();
                     }
                     break;
+            }
+        }
+        /// <summary>
+        /// Adds the explorer menu.
+        /// </summary>
+        private void AddExplorerMenu()
+        {
+            try
+            {
+                // Iterate openWithTimp registry keys
+                foreach (string openWithTimpKey in this.openWithTimpKeyList)
+                {
+                    // Add openWithTimp command to registry
+                    RegistryKey registryKey;
+                    registryKey = Registry.CurrentUser.CreateSubKey(openWithTimpKey);
+                    registryKey.SetValue("icon", Application.ExecutablePath);
+                    registryKey.SetValue("position", "-");
+                    registryKey = Registry.CurrentUser.CreateSubKey($"{openWithTimpKey}\\command");
+                    registryKey.SetValue(string.Empty, $"{Application.ExecutablePath} /play \"%1\"");
+                    registryKey.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Notify user
+                MessageBox.Show($"Error when adding \"Open with TIMP\" context menu to registry.{Environment.NewLine}{Environment.NewLine}Message:{Environment.NewLine}{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Removes the explorer menu.
+        /// </summary>
+        private void RemoveExplorerMenu()
+        {
+            try
+            {
+                // Iterate openWithTimp registry keys 
+                foreach (var openWithTimpKey in this.openWithTimpKeyList)
+                {
+                    // Remove openWithTimp command to registry
+                    Registry.CurrentUser.DeleteSubKeyTree(openWithTimpKey);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Notify user
+                MessageBox.Show($"Error when removing \"Open with TIMP\" context menu to registry.{Environment.NewLine}{Environment.NewLine}Message:{Environment.NewLine}{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
