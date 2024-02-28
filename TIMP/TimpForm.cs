@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Windows.Forms;
 using NAudio.Wave;
 using System.Windows.Forms.VisualStyles;
 using System.Data;
 using Microsoft.Win32;
-using System.Media;
+//#using Id3;
 
 namespace TIMP
 {
@@ -68,9 +69,9 @@ namespace TIMP
         private SoundPlayer soundPlayer = null;
 
         /// <summary>
-        /// The advise sound path.
+        /// The auditory feedback file path.
         /// </summary>
-        private string adviseSoundPath = "ent_screen02.wav";
+        private string auditoryFeedbackFilePath = Path.Combine(Application.StartupPath, "ent_screen02.wav");
 
         /// <summary>
         /// The update tip flag.
@@ -107,7 +108,7 @@ namespace TIMP
 
             // Add columns to the plaer's data table
             this.playerDataTable.Columns.Add("Title", typeof(string));
-            this.playerDataTable.Columns.Add("Duration", typeof(TimeSpan));
+            this.playerDataTable.Columns.Add("Duration", typeof(string));
             this.playerDataTable.Columns.Add("Artist", typeof(string));
             this.playerDataTable.Columns.Add("Album", typeof(string));
             this.playerDataTable.Columns.Add("Year", typeof(string));
@@ -181,10 +182,10 @@ namespace TIMP
         public void ProcessClientMessage(string[] timpArguments)
         {
             // Auditory feedback
-            if (File.Exists(this.adviseSoundPath))
+            if (File.Exists(this.auditoryFeedbackFilePath))
             {
                 // Play the file
-                this.PlaySoundFile(this.adviseSoundPath);
+                this.PlaySoundFile(this.auditoryFeedbackFilePath);
             }
 
             // Switch the passed TIMP arguments
@@ -440,9 +441,6 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnTimpFormLoad(object sender, EventArgs e)
         {
-            // Bind the data table
-            this.playerDataGridView.DataSource = this.playerDataTable;
-
             // Relocate and hide the form
             this.RelocateAndHide();
 
@@ -660,29 +658,64 @@ namespace TIMP
                 // Set files list
                 List<string> filesList = files.Select(f => f.FullName).ToList();
 
+                // Check if mjust remove
+                if (Path.GetFullPath(Application.StartupPath) == Path.GetFullPath(passedDirectoryPath) && filesList.Contains(this.auditoryFeedbackFilePath))
+                {
+                    // Remove auditory feedback file from current files list
+                    filesList.Remove(this.auditoryFeedbackFilePath);
+                }
+
                 // Stop any playing
                 this.Stop();
 
-                // Clear data table
-                this.playerDataTable.Clear();
+                // Unset data source
+                this.playerDataGridView.DataSource = null;
 
-                /* Add files to list box */
+                // Clear data table rows
+                this.playerDataTable.Rows.Clear();
 
-                // Iterate files sequentially
+                // Process file tags sequentially
                 for (int i = 0; i < filesList.Count; i++)
                 {
-                    // Add row
-                    this.playerDataTable.Rows.Add(Path.GetFileNameWithoutExtension(filesList[i]), new TimeSpan(), string.Empty, string.Empty, string.Empty, filesList[i]);
+                    try
+                    {
+                        // Set file info
+                        string filePath = Path.GetFullPath(filesList[i]);
+
+                        // Set the TagLib file
+                        var tagLibFile = TagLib.File.Create(filePath);
+
+                        // Set the variables
+                        string title = !string.IsNullOrEmpty(tagLibFile.Tag.Title) ? tagLibFile.Tag.Title : Path.GetFileNameWithoutExtension(filePath);
+                        string duration = tagLibFile.Properties.Duration.Hours > 0 ? tagLibFile.Properties.Duration.ToString(@"hh\:mm\:ss") : tagLibFile.Properties.Duration.ToString(@"mm\:ss");
+                        string artist = !string.IsNullOrEmpty(tagLibFile.Tag.JoinedAlbumArtists) ? tagLibFile.Tag.JoinedAlbumArtists : string.Empty;
+                        string album = !string.IsNullOrEmpty(tagLibFile.Tag.Album) ? tagLibFile.Tag.Album : string.Empty;
+                        string year = tagLibFile.Tag.Year > 0 ? tagLibFile.Tag.Year.ToString() : string.Empty;
+
+                        // Add row
+                        this.playerDataTable.Rows.Add(
+                        title,
+                        duration,
+                        artist,
+                        album,
+                        year,
+                        filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO Log error
+                    }
                 }
 
-                // TODO Check if must shuffle [Can be taken out later to keep a single responsibility]
+                // Check if must shuffle [Can be taken out later to keep a single responsibility. Keeping it here beecause of the datasource reasignment]
                 if (this.shuffledToolStripMenuItem.Checked)
                 {
                     // Shuffle files list
                     this.ShuffleItems(false);
                 }
 
-                // TODO Process file tags to populate listview
+                // Bind the data table
+                this.playerDataGridView.DataSource = this.playerDataTable;
 
                 // Update track count
                 this.tracksToolStripStatusLabel.Text = this.playerDataTable.Rows.Count.ToString();
@@ -1615,6 +1648,28 @@ namespace TIMP
             {
                 // Notify user
                 MessageBox.Show($"Error when removing \"Open with TIMP\" context menu to registry.{Environment.NewLine}{Environment.NewLine}Message:{Environment.NewLine}{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Ons the play pause button mouse click.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        private void OnPlayPauseButtonMouseClick(object sender, MouseEventArgs e)
+        {
+            // Check for right cilck
+            if (e.Button == MouseButtons.Right)
+            {
+                // Stop
+                this.Stop();
+
+                // Check if must update the tip
+                if (this.updateTip)
+                {
+                    // Trigger button enter
+                    this.OnButtonMouseEnter(sender, e);
+                }
             }
         }
     }
