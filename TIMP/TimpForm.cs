@@ -10,6 +10,8 @@ using System.Windows.Forms.VisualStyles;
 using System.Data;
 using Microsoft.Win32;
 //#using Id3;
+using NAudio.Utils;
+using System.Runtime.CompilerServices;
 
 namespace TIMP
 {
@@ -49,6 +51,11 @@ namespace TIMP
         private AudioFileReader audioFile;
 
         /// <summary>
+        /// The audio volume.
+        /// </summary>
+        private WaveChannel32 audioVolume;
+
+        /// <summary>
         /// The directory path.
         /// </summary>
         private string directoryPath;
@@ -79,6 +86,11 @@ namespace TIMP
         private bool updateTip = false;
 
         /// <summary>
+        /// The action timer.
+        /// </summary>
+        private System.Timers.Timer actionTimer;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:TIMP.TimpForm"/> class.
         /// </summary>
         /// <param name="timpApplicationContext">Timp application context.</param>
@@ -106,18 +118,63 @@ namespace TIMP
 
             /* Declare the data table columns */
 
-            // Add columns to the plaer's data table
+            // Add columns to the player's data table
             this.playerDataTable.Columns.Add("Title", typeof(string));
             this.playerDataTable.Columns.Add("Duration", typeof(string));
             this.playerDataTable.Columns.Add("Artist", typeof(string));
             this.playerDataTable.Columns.Add("Album", typeof(string));
             this.playerDataTable.Columns.Add("Year", typeof(string));
             this.playerDataTable.Columns.Add("Path", typeof(string));
+
+            /* Set timer */
+
+            // Create a timer and set a two second interval.
+            this.actionTimer = new System.Timers.Timer
+            {
+                Interval = 250 // Four times per second
+            };
+
+            // Hook the event up
+            this.actionTimer.Elapsed += OnTimedEvent;
+
+            // Explicitly fire repeated events
+            this.actionTimer.AutoReset = true;
+
+            /* TrackBar */
+
+            // Set AutoSize
+            this.playTimeTrackBar.AutoSize = true;
+        }
+
+        /// <summary>
+        /// Handles the timed event.
+        /// </summary>
+        /// <param name="source">Source.</param>
+        /// <param name="e">Elapsed event arguments.</param>
+        private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            // TODO Check if the music is playing [Logic/flow can be improved]
+            if (this.actionTimer.Enabled && this.IsPlaying)
+            {
+                // Set current time
+                string currentTime = this.CurrentTime;
+
+                // Check if it's equal
+                if (this.playTimeLabel.Text != currentTime)
+                {
+                    // Update playtime label 
+                    this.playTimeLabel.Text = currentTime;
+
+                    // Update trackbar value
+                    this.playTimeTrackBar.Value = (int)((this.audioFile.CurrentTime.TotalSeconds / this.audioFile.TotalTime.TotalSeconds) * 100);
+                }
+            }
         }
 
         /// <summary>
         /// Processes the play command.
         /// </summary>
+        /// <param name="timpArguments">Timp arguments.</param>
         private void ProcessPlayCommand(string[] timpArguments)
         {
             // Check if a directory has been passed for play
@@ -182,7 +239,7 @@ namespace TIMP
         public void ProcessClientMessage(string[] timpArguments)
         {
             // Auditory feedback
-            if (File.Exists(this.auditoryFeedbackFilePath))
+            if (this.auditoryFeedbackToolStripMenuItem.Checked && File.Exists(this.auditoryFeedbackFilePath))
             {
                 // Play the file
                 this.PlaySoundFile(this.auditoryFeedbackFilePath);
@@ -218,7 +275,7 @@ namespace TIMP
 
                 // Pause
                 case "/pause":
-                    this.NAudioPause();
+                    this.Pause();
 
                     break;
 
@@ -402,6 +459,9 @@ namespace TIMP
                     // Resume playback
                     this.outputDevice.Play();
 
+                    // Start the timer
+                    this.actionTimer.Start();
+
                     break;
 
                 // Stopped
@@ -484,6 +544,9 @@ namespace TIMP
             this.loopModeCheckBox.Checked = true;
             this.sortShuffleCheckBox.Checked = true;
             this.addToExplorerToolStripMenuItem.PerformClick();
+            this.autoplayToolStripMenuItem.Checked = true;
+            this.auditoryFeedbackToolStripMenuItem.Checked = true;
+            this.usehotkeysToolStripMenuItem.Checked = true;
 
             // Open registry key
             using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false))
@@ -927,9 +990,21 @@ namespace TIMP
             this.outputDevice = new WaveOutEvent();
             this.outputDevice.PlaybackStopped += this.OnPlaybackStopped;
 
-            // Set the audio file and init
+            // Set the audio file
             this.audioFile = new AudioFileReader(audioFilePath);
+
+            // Set the audio volume
+            this.audioVolume = new WaveChannel32(this.audioFile);
+
+            // Initialize the output device
             this.outputDevice.Init(audioFile);
+
+            // Update time labels
+            this.totalTimeLabel.Text = this.TotalTime;
+            this.playTimeLabel.Text = this.CurrentTime;
+
+            // Start the timer
+            this.actionTimer.Start();
 
             // Play it
             this.outputDevice.Play();
@@ -945,9 +1020,18 @@ namespace TIMP
         }
 
         /// <summary>
-        /// NAs the udio pause.
+        /// Play this instance.
         /// </summary>
-        private void NAudioPause()
+        private void Play()
+        {
+            // PlayPause with play
+            this.PlayPause(false);
+        }
+
+        /// <summary>
+        /// Pause this instance.
+        /// </summary>
+        private void Pause()
         {
             // Check there is an output device
             if (this.outputDevice != null && this.outputDevice.PlaybackState == PlaybackState.Playing)
@@ -976,6 +1060,63 @@ namespace TIMP
         private bool IsStopped => (this.outputDevice.PlaybackState == PlaybackState.Stopped);
 
         /// <summary>
+        /// Gets or sets the time position.
+        /// </summary>
+        /// <value>The time position.</value>
+        public TimeSpan TimePosition
+        {
+            get => this.audioFile == null ? TimeSpan.Zero : this.audioFile.CurrentTime;
+            set { if (this.audioFile != null) { this.audioFile.CurrentTime = value; } }
+        }
+
+        /// <summary>
+        /// Gets the total duration.
+        /// </summary>
+        /// <value>The total duration.</value>
+        public TimeSpan TotalDuration
+        {
+            get => this.audioFile == null ? new TimeSpan() : this.audioFile.TotalTime;
+        }
+
+        /// <summary>
+        /// Gets the total time.
+        /// </summary>
+        /// <value>The total time.</value>
+        public string TotalTime
+        {
+            get
+            {
+                if (this.audioFile != null)
+                {
+                    return this.audioFile.TotalTime.Hours > 0 ? this.audioFile.TotalTime.ToString(@"hh\:mm\:ss") : this.audioFile.TotalTime.ToString(@"mm\:ss");
+                }
+                else
+                {
+                    return "00:00";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the current time.
+        /// </summary>
+        /// <value>The current time.</value>
+        public string CurrentTime
+        {
+            get
+            {
+                if (this.audioFile != null)
+                {
+                    return this.audioFile.CurrentTime.Hours > 0 ? this.audioFile.CurrentTime.ToString(@"hh\:mm\:ss") : this.audioFile.CurrentTime.ToString(@"mm\:ss");
+                }
+                else
+                {
+                    return "00:00";
+                }
+            }
+        }
+
+        /// <summary>
         /// NAs the udio reset.
         /// </summary>
         private void NAudioReset()
@@ -989,6 +1130,18 @@ namespace TIMP
                 this.outputDevice.Stop();
                 this.outputDevice.Dispose();
                 this.outputDevice = null;
+            }
+
+            // Reset trackbar and time values
+            this.playTimeTrackBar.Value = 0;
+            this.playTimeLabel.Text = "00:00";
+            this.totalTimeLabel.Text = "00:00";
+
+            // Reset audio volume
+            if (this.audioVolume != null)
+            {
+                this.audioVolume.Dispose();
+                this.audioVolume = null;
             }
 
             // Reset audio file
@@ -1006,6 +1159,13 @@ namespace TIMP
         /// <param name="args">Arguments.</param>
         private void OnPlaybackStopped(object sender, StoppedEventArgs args)
         {
+            // TODO Check if must stop the timer [Can improve logic and consolidate checks]
+            if (this.stopFlag || this.IsPaused)
+            {
+                // Stop the timer
+                //#this.actionTimer.Stop();
+            }
+
             // Check for flag
             if (this.stopFlag)
             {
@@ -1206,7 +1366,7 @@ namespace TIMP
                 // Pause
                 case "pauseToolStripMenuItem":
                     // Perform action
-                    this.NAudioPause();
+                    this.Pause();
 
                     break;
 
@@ -1261,14 +1421,34 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayTimeTrackBarScroll(object sender, EventArgs e)
         {
+            // Stop the timer
+            this.actionTimer.Stop();
 
+            // Set the audio file current time.
+            this.SetAudioFileCurrentTime();
+
+            // Start the timer
+            this.actionTimer.Start();
         }
 
         /// <summary>
-        /// Handles the hide button click.
+        /// Sets the audio file current time.
         /// </summary>
-        /// <param name="sender">Sender object.</param>
-        /// <param name="e">Event arguments.</param>
+        private void SetAudioFileCurrentTime()
+        {
+            // Check for an audio file
+            if (this.audioFile != null)
+            {
+                // Set new current time
+                this.audioFile.CurrentTime = new TimeSpan((long)(this.playTimeTrackBar.Value * this.audioFile.TotalTime.Ticks / 100));
+            }
+        }
+
+        /// <summary>
+        /// Ons the hide button click.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
         private void OnHideButtonClick(object sender, EventArgs e)
         {
             // Hide form
@@ -1657,6 +1837,36 @@ namespace TIMP
         /// <param name="sender">Sender.</param>
         /// <param name="e">E.</param>
         private void OnPlayPauseButtonMouseClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Ons the play time track bar mouse down.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        private void OnPlayTimeTrackBarMouseDown(object sender, MouseEventArgs e)
+        {
+            // Stop the timer
+            this.actionTimer.Stop();
+
+            // Set trackbar value
+            this.playTimeTrackBar.Value = Convert.ToInt32(((double)e.X / (double)this.playTimeTrackBar.Width) * (this.playTimeTrackBar.Maximum - this.playTimeTrackBar.Minimum));
+
+            // Set the audio file current time
+            this.SetAudioFileCurrentTime();
+
+            // Start the timer
+            this.actionTimer.Start();
+        }
+
+        /// <summary>
+        /// Ons the play pause button mouse down.
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        private void OnPlayPauseButtonMouseDown(object sender, MouseEventArgs e)
         {
             // Check for right cilck
             if (e.Button == MouseButtons.Right)
