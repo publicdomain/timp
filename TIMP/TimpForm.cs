@@ -233,17 +233,26 @@ namespace TIMP
         }
 
         /// <summary>
+        /// Auditories the feedback.
+        /// </summary>
+        private void AuditoryFeedback()
+        {
+            // Check if must trigger auditory feedback
+            if (this.auditoryFeedbackToolStripMenuItem.Checked && File.Exists(this.auditoryFeedbackFilePath))
+            {
+                // Play the file
+                this.PlaySoundFile(this.auditoryFeedbackFilePath);
+            }
+        }
+
+        /// <summary>
         /// Processes the client message.
         /// </summary>
         /// <param name="timpArguments">Timp arguments.</param>
         public void ProcessClientMessage(string[] timpArguments)
         {
             // Auditory feedback
-            if (this.auditoryFeedbackToolStripMenuItem.Checked && File.Exists(this.auditoryFeedbackFilePath))
-            {
-                // Play the file
-                this.PlaySoundFile(this.auditoryFeedbackFilePath);
-            }
+            this.AuditoryFeedback();
 
             // Switch the passed TIMP arguments
             switch (timpArguments[0].ToLowerInvariant())
@@ -570,8 +579,12 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         public void OnMainNotifyIconClick(object sender, MouseEventArgs e)
         {
+            // Check button
             if (e.Button == MouseButtons.Left)
             {
+                // Auditory feedback
+                this.AuditoryFeedback();
+
                 // Relocate and show
                 this.RelocateAndShow();
             }
@@ -1350,6 +1363,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnActionsToolStripMenuItemDropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Set tool strip menu item
             ToolStripMenuItem toolStripMenuItem = (ToolStripMenuItem)e.ClickedItem;
 
@@ -1451,6 +1467,9 @@ namespace TIMP
         /// <param name="e">E.</param>
         private void OnHideButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Hide form
             this.Hide();
         }
@@ -1462,6 +1481,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnSortShuffleCheckBoxCheckedChanged(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Act on current check state
             if (this.sortShuffleCheckBox.Checked)
             {
@@ -1503,6 +1525,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnFirstButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Play the first track
             this.PlayFirst();
         }
@@ -1514,6 +1539,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPreviousButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Play the previous track
             this.PlayPrev();
         }
@@ -1525,7 +1553,8 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayPauseButtonClick(object sender, EventArgs e)
         {
-            // TODO Can refactor to stop on right-click
+            // Auditory feedback
+            this.AuditoryFeedback();
 
             // Trigger PlayPause
             this.PlayPause(false);
@@ -1545,6 +1574,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnNextButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Play the next track
             this.PlayNext();
         }
@@ -1556,6 +1588,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnLastButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Play the last track
             this.PlayLast();
         }
@@ -1567,6 +1602,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnExitButtonClick(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Hide tray icon and exit
             this.ExitTimp();
         }
@@ -1613,6 +1651,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnButtonMouseEnter(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Set update tip flag
             this.updateTip = true;
 
@@ -1681,6 +1722,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnButtonMouseLeave(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Reset update tip flag
             this.updateTip = false;
 
@@ -1725,6 +1769,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnPlayerDataGridViewCellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Check for left click and if item is the same as currently slected
             if (e.Button == MouseButtons.Left && this.playerDataGridView.SelectedRows[0].Index == e.RowIndex)
             {
@@ -1740,6 +1787,9 @@ namespace TIMP
         /// <param name="e">Event arguments.</param>
         private void OnLoopModeCheckBoxCheckStateChanged(object sender, EventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Act on current check state
             switch (this.loopModeCheckBox.CheckState)
             {
@@ -1848,6 +1898,9 @@ namespace TIMP
         /// <param name="e">E.</param>
         private void OnPlayTimeTrackBarMouseDown(object sender, MouseEventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Stop the timer
             this.actionTimer.Stop();
 
@@ -1868,6 +1921,9 @@ namespace TIMP
         /// <param name="e">E.</param>
         private void OnPlayPauseButtonMouseDown(object sender, MouseEventArgs e)
         {
+            // Auditory feedback
+            this.AuditoryFeedback();
+
             // Check for right cilck
             if (e.Button == MouseButtons.Right)
             {
